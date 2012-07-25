@@ -1,21 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <menu>
 	<vars
-		x="360" y="340" direction="vertical"
+		x="550" y="420" direction="vertical"
 		buttonSpacing="0" textTopOffset="10" textBottomOffset="5"
 		currentItem="-1" itemAlpha="0.5" curItemAlpha="1" animationTime="0.3"
 	>
-		<font size="56" color="#CB4121" />
+		<font size="46" color="#CB4121" />
 		<glow color="#CB4121" alpha="0.5" blurX="25" blurY="20" strength="5" />
 	</vars>
 	 <item>
     <text>PLAY</text>
-    <method>game1</method>
+    <method>game</method>
     <args></args>
   </item>
    <item>
     <text>EXIT</text>
-    <method>game2</method>
+    <method>quit</method>
     <args></args>
   </item>
 </menu>

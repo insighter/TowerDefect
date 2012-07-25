@@ -14,7 +14,6 @@ package com.towerdefect
 		 * using predefined border filters
          *
          * @author insighter
-         * @version 1.0
          */
 	public class BaseMC extends MovieClip
 	{		
@@ -39,6 +38,8 @@ package com.towerdefect
 			 * -	filters : Boolean = true			If should use some predefined filters that look like border
 			 * -	filterColor : uint = 0x000000		The color of that border
 			 * -	useEvents : Boolean = false			If should react on mouse
+			 * -	mouseDownMethod : String = name		Method to be called on mouseDown
+			 * -	buttonMode : Boolean = false		Enable or not hand cursor
              */
 		public function BaseMC(args:Object=null)
 		{
@@ -46,6 +47,7 @@ package com.towerdefect
 			this.sf = new DropShadowFilter();
 			this.gf = new GlowFilter();
 			this.bf = new BevelFilter();
+			this.buttonMode = init.getBoolean("buttonMode", false);
 			this.filterColor = init.getColor("filterColor", uint(0x000000));
 			if (init.getBoolean("filters", true)) setFilters();
 			this.name = init.getString("name", "baseMC");
@@ -62,7 +64,7 @@ package com.towerdefect
 				addEventListener(MouseEvent.ROLL_OUT, mouseOut, false, 0, true);
 				addEventListener(MouseEvent.MOUSE_DOWN, mouseDown, false, 0, true);
 			}
-			//this._mouseDownMethod = init.getString("mouseDownMethod", this.name);	//mouseDownMethod : to eventDispatcher on mouseDown
+			this._mouseDownMethod = init.getString("mouseDownMethod", this.name);	
 		}
 		
 		public function get method():String
@@ -80,14 +82,12 @@ package com.towerdefect
 			TweenLite.fromTo(this, time, { alpha: 0 }, { alpha: opaque} );
 		}
 		
-		public function hide(time:Number = 0.3, shiftX:int = 0, shiftY:int = 0):void
-		{						
-			TweenLite.fromTo(this, time, { alpha: opaque }, { alpha: 0, x:shiftX, y:shiftY} );
-		}
-		
-		public function destroy(time:Number=0.3, shiftX:int = 0):void
-		{
-			TweenLite.to(this, time, { x: shiftX, alpha:0, onComplete:rem} );
+		public function hide(time:Number = 0.3, shiftX:int = 0, shiftY:int = 0, scaleX:Number=1, scaleY:Number=1, destroy:Boolean=false):void
+		{			
+			if (destroy)
+				TweenLite.fromTo(this, time, { alpha: opaque }, { alpha: 0, x:x+shiftX, y:y+shiftY, scaleX:scaleX, scaleY:scaleY, onComplete:rem } );
+			else
+				TweenLite.fromTo(this, time, { alpha: opaque }, { alpha: 0, x:x+shiftX, y:y+shiftY, scaleX:scaleX, scaleY:scaleY } );
 		}
 
 		private function rem():void

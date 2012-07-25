@@ -7,11 +7,11 @@
 	{		
 		public static var clrSBMain:String="#CB9121";
 		public static var clrBMain:uint = 0xCB9121;		
-		public static var clrSBRed:String = "#AA4444";
+		
 		public static var clrBRed:uint = 0xAA4444;
 		public static var clrSBGreen:String = "#228822";
 		public static var clrBGreen:uint=0x228822;
-		public static var clrSBBlue:String = "#6666DD";
+		
 		public static var clrBBlue:uint=0x6666DD;
 		public static var clrSBPenalty:String ="#776666";
 		public static var clrSMain:String="#000000";
@@ -24,7 +24,11 @@
 		public static var clrBlue:uint=0x000022;
 		public static var clrSYellow:String = "#CB9121";
 		public static var clrYellow:uint=0xCB9121;
-		public static var clrSPenalty:String ="#776666";
+		public static var clrSPenalty:String = "#776666";
+		
+		public static var clrSBlack:String = "#110000";
+		public static var clrSBBlue:String = "#6666DD";
+		public static var clrSBRed:String = "#AA4444";
 
 		public static function imgSmooth(e:Event):void
 		{
@@ -106,7 +110,7 @@
 		
 		public static function toHTML(str:String):String
 		{
-			var TXT:String="<font color='" + clrSBMain + "'>";
+			var TXT:String="";
 			var arr:Array = str.split("");
 			do
 			{
@@ -115,15 +119,31 @@
 					arr.shift();
 					switch (arr[0])
 					{
-						case 'y':TXT +=  "<font color='" + clrSYellow +	"'>";break;
+						case 'y':TXT +=  "<font color='" + clrSYellow +	"'>"; break;
 						case 'r':TXT +=  "<font color='" + clrSBRed + 		"'>";break;
 						case 'b':TXT +=  "<font color='" + clrSBBlue + 		"'>";break;
-						case 'g':TXT +=  "<font color='" + clrSBGreen + 	"'>";break;
+						case 'g':TXT +=  "<font color='" + clrSBGreen + 	"'>"; break;
+						case 'd':TXT +=  "<font color='" + clrSBlack + 	"'>";break;
+					}				
+				}
+				else if (arr[0] == '{')
+				{
+					arr.shift();
+					switch (arr[0])
+					{
+						case '0':TXT +=  "<font size='10'>"; break;
+						case '1':TXT +=  "<font size='12'>";break;
+						case '2':TXT +=  "<font size='15'>";break;
+						case '3':TXT +=  "<font size='25'>"; break;
+						case '4':TXT +=  "<font size='50'>"; break;
+						case '5':TXT +=  "<font size='100'>"; break;
+						case '6':TXT +=  "<font size='150'>";break;
 					}				
 				}
 				else switch (arr[0])
 				{												
-					case '>' :	TXT +=  "</font>";	break;								
+					case '>' :	TXT +=  "</font>";	break;
+					case '}' :	TXT +=  "</font>";	break;
 					case '^' :	TXT +=  "<br>";		break;
 					default :	TXT +=  arr[0]; 	break;
 				}

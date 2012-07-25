@@ -12,6 +12,7 @@ package com.towerdefect
 	/**
          * TextLineMC = ImageMC + TextField = BaseMC + Image + TextField. Provides animation effect when text changes
          * *This TextField is single-line only
+		 * 
          * @author insighter
          */
 	public class TextLineMC extends ImageMC
@@ -34,14 +35,15 @@ package com.towerdefect
 			 * -	fontColor : uint = 0xFF0000
 			 * -	text : String = "No text"		The text to show upon create
              */
-		public function TextLineMC(args:Object)
+		public function TextLineMC(args:Object=null)
 		{
 			super(args);
 			this.init = new Init(args);
-			buttonMode = true;
 			mouseChildren = false;
 			tf = new TextFormat();
-			tf.font = init.getObject("fontName").fontName;
+			var fontObj:Object = init.getObject("fontName");
+			if (fontObj == null) fontObj = new mySegoePrint();
+			tf.font = fontObj.fontName;
 			tf.size = init.getInt("fontSize", 12);
 			tf.align = init.getString("fontAlign", "center");
 			textField = new TextField();
@@ -51,7 +53,7 @@ package com.towerdefect
 			textField.multiline = false;
 			textField.embedFonts = false;
 			textField.defaultTextFormat = tf;
-			textField.htmlText = init.getString("text", "No text");
+			textField.htmlText = Utils.toHTML(init.getString("text", "No text"));
 			textField.antiAliasType = AntiAliasType.ADVANCED;
 			addChild(textField);
 		}
@@ -60,7 +62,7 @@ package com.towerdefect
 		{			
 			if (oldText!=text)
 				changeValueEffects();
-			textField.htmlText = Utils.toHTML(text);
+			textField.htmlText = "<font color='" + textField.textColor + "'>"+Utils.toHTML(text);
 			oldText = text;
 		}
 		

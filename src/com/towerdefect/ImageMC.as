@@ -22,6 +22,7 @@ package com.towerdefect
 			 * -	image : BitmapData = null
 			 * -	imageOpaque : Number = 1
 			 * -	animation : Boolean = false
+			 * -	centerImage : Boolean = true	Whether or not center image
              */
 		public function ImageMC(args:Object=null)
 		{
@@ -32,10 +33,13 @@ package com.towerdefect
 			{
 				var u:Bitmap=new Bitmap(image, "auto", true);
 				addChild(u);
-				u.x = -rect.width / 2;
-				u.y = -rect.height / 2;
-				u.width = rect.width;
-				u.height = rect.height;
+				if (rect.width != 0) u.width = rect.width;
+				if (rect.height != 0) u.height = rect.height;
+				if (init.getBoolean("centerImage", true))
+				{
+					u.x = -u.width / 2;
+					u.y = -u.height / 2;
+				}
 				u.alpha = init.getNumber("imageOpaque", 1);
 			}
 			if (init.getBoolean("animation", false))

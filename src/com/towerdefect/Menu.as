@@ -80,7 +80,7 @@
 			
 			//Clearing previous menu items and creating new
 			for each(var item:TextLineMC in menuItems)
-				item.destroy(0.3, -50);
+				item.hide(0.3, -50);
 			menuItems = new Array();
 			var coor:int = 0;
 			for (var i:int = 0; i < xml.item.length(); i++)
@@ -98,11 +98,11 @@
 					text:xml.item[i].text,
 					rect:new Rectangle(xx, yy, 0, 0),
 					fontAlign:TextFormatAlign.CENTER,
-					fontName:new mySegoeUI(),
 					fontSize:menuParams.fontSize,
 					fontColor:menuParams.fontColor,
 					mouseDownMethod:xml.item[i].method,
-					useEvents:true
+					useEvents:true,
+					buttonMode:true
 				});
 				glf = new GlowFilter(menuParams.glowColor, 0, 0, 0, 2, BitmapFilterQuality.HIGH);
 				item.filters = [glf];
@@ -117,6 +117,7 @@
 			var item:TextLineMC = e.args;
 			TweenMax.fromTo(item, menuParams.animationTime, {alpha:item.alpha, glowFilter:{alpha:0, strength:0, blurX:0, blurY:0}}, {alpha:menuParams.curItemAlpha, ease:SineOut, glowFilter:{alpha:menuParams.glowAlpha, strength:menuParams.glowStrength, blurX:menuParams.glowBlurX, blurY:menuParams.glowBlurY}} );
 			changeItemsAlpha(item);
+			soundManager.playSound("menuOver");
 		}
 				
 		private function itemMouseOut(e:CustomEvent):void
@@ -133,12 +134,18 @@
 			if (item != menuParams.currentItem)
 			{				
 				menuParams.currentItem = item;
-				TweenMax.to(item, menuParams.animationTime, { scaleX:2, scaleY:2 } );
-				for each(var I:TextLineMC in menuItems) 
-					if (I != item)
-						TweenMax.to(I, menuParams.animationTime, { scaleX:0, scaleY:0 } );
+				chooseItemAnimation();
+				soundManager.playSound("menuClick");
 				dispatchEvent(new CustomEvent(CustomEvent.MENU, item.method, true));
 			}
+		}
+		
+		private function chooseItemAnimation():void
+		{
+			TweenMax.to(menuParams.currentItem, menuParams.animationTime, { scaleX:2, scaleY:2 } );
+			for each(var I:TextLineMC in menuItems) 
+				if (I != menuParams.currentItem)
+					TweenMax.to(I, menuParams.animationTime, { scaleX:0, scaleY:0 } );
 		}
 		
 		private function changeItemsAlpha(activeItem:TextLineMC):void
