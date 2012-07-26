@@ -59,20 +59,20 @@
 			timer.start();						
 			loadedTMC = new TextLineMC( { rect:new Rectangle(-50, 0, 0, 0), fontColor:textColor} );
 			remainTMC = new TextLineMC( { rect:new Rectangle(-50, 30, 0, 0), fontColor:textColor} );
-			imagesTMC = new TextLineMC( { rect:new Rectangle(-50, 60, 0, 0), fontColor:textColor} );
-			progressTMC = new TextLineMC( { rect:new Rectangle(-50, 90, 0, 0), fontColor:textColor} );
+			imagesTMC = new TextLineMC( { rect:new Rectangle(-50, -30, 0, 0), fontColor:textColor} );
+			progressTMC = new TextLineMC( { rect:new Rectangle(-50, 60, 0, 0), fontColor:textColor} );
 			addChild(loadedTMC);
 			addChild(remainTMC);
-			addChild(imagesTMC);
+			//addChild(imagesTMC);
 			addChild(progressTMC);
 			emptyBar = new ImageMC( {
 				image:emptyBarImage,
-				rect:new Rectangle(0, 200, 0, 0)
+				rect:new Rectangle(0, 100, 0, 0)
 			});
 			addChild(emptyBar);
 			progressBar = new ImageMC( {
 				image:progressBarImage,
-				rect:new Rectangle(0, 200, 0, 0)
+				rect:new Rectangle(0, 100, 0, 0)
 			});
 			addChild(progressBar);
 			

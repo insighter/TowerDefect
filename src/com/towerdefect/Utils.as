@@ -29,7 +29,16 @@
 		public static var clrSBlack:String = "#110000";
 		public static var clrSBBlue:String = "#6666DD";
 		public static var clrSBRed:String = "#AA4444";
-
+		/**
+         * Returns value if value is in interval, otherwise returns min if value < min or max if value > max
+         */
+		public static function matchInterval(value:int, min:int, max:int):int
+		{
+			if (value < min) return min;
+			if (value > max) return max;
+			return value;
+		}
+		
 		public static function imgSmooth(e:Event):void
 		{
 			(e.target.content as Bitmap).smoothing=true;
@@ -186,6 +195,17 @@
 					return c.image;
 			return null;
 		}
+		
+		public static function getAllBMPByName(bmps:Array, name:String):Array
+		{
+			var ar:Array = new Array();
+			for each(var c:Image in bmps)
+			{
+				if (c.name.indexOf(name)!=-1)
+					ar.push(c.image);
+			}
+			return ar;
+		}		
 		
 		public static function getImageByName(bmps:Array, name:String):Image
 		{

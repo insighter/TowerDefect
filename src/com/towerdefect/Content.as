@@ -11,6 +11,9 @@
 		public static var images:Array = [
 			new Image("fone.dop", 		"../images/main/dop.jpg"),	
 			new Image("fone.main", 		"../images/main/main.jpg"),
+			new Image("fone.field", 	"../images/main/field.jpg"),
+			
+			new Image("tile.1", 		"../images/tile/tile_s1.jpg"),
 			
 			new Image("circle.w", 		"../images/balls/circleW.png"),
 			new Image("circle.b", 		"../images/balls/circleB.png"),

@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <menu>
-	<vars>
+	<vars
+		fieldWidth="500" fieldHeight="500"
+		gridCountX="10" gridCountY="10"
+	>
 		<font size="56" color="#CB4121" />
 	</vars>
 </menu>

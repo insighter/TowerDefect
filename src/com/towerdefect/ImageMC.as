@@ -14,6 +14,7 @@ package com.towerdefect
 	public class ImageMC extends BaseMC
 	{
 		private var init:Init;
+		protected var bitmap:Bitmap;
 		
 		/**
              * 
@@ -23,6 +24,7 @@ package com.towerdefect
 			 * -	imageOpaque : Number = 1
 			 * -	animation : Boolean = false
 			 * -	centerImage : Boolean = true	Whether or not center image
+			 * -	fillColor : uint = 0x000000		Fill movie clip with solid color instead of using image
              */
 		public function ImageMC(args:Object=null)
 		{
@@ -31,16 +33,25 @@ package com.towerdefect
 			var image:BitmapData = init.getBitmap("image");
 			if(image!=null)
 			{
-				var u:Bitmap=new Bitmap(image, "auto", true);
-				addChild(u);
-				if (rect.width != 0) u.width = rect.width;
-				if (rect.height != 0) u.height = rect.height;
+				bitmap=new Bitmap(image, "auto", true);
+				addChild(bitmap);
+				if (rect.width != 0) bitmap.width = rect.width;
+				if (rect.height != 0) bitmap.height = rect.height;
 				if (init.getBoolean("centerImage", true))
 				{
-					u.x = -u.width / 2;
-					u.y = -u.height / 2;
+					bitmap.x = -bitmap.width / 2;
+					bitmap.y = -bitmap.height / 2;
+					if (bitmap.width % 2 == 0) bitmap.x--;
+					if (bitmap.height % 2 == 0) bitmap.y--;
 				}
-				u.alpha = init.getNumber("imageOpaque", 1);
+				bitmap.alpha = init.getNumber("imageOpaque", 1);
+			}
+			//If no image passed, but rect isn't zero, fill it with solid color
+			else if (rect.width != 0 && rect.height != 0)
+			{
+				graphics.beginFill(init.getColor("fillColor", 0x000000));
+				this.graphics.drawRect(0, 0, rect.width, rect.height);
+				graphics.endFill();
 			}
 			if (init.getBoolean("animation", false))
 			{

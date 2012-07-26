@@ -2,6 +2,7 @@ package com.towerdefect
 {
 	import com.greensock.easing.ExpoInOut;
 	import com.greensock.TweenLite;
+	import flash.events.Event;
 	import flash.text.Font;
 	import flash.text.FontStyle;
 	import flash.text.TextField;
@@ -72,8 +73,8 @@ package com.towerdefect
 			//in the parent class using addExternalSound(s.path, s.name) function
 			if (soundManager!=null)
 				soundManager.playSound("changeTextValueSound", 1);
-			TweenLite.to(this, 0.1, { scaleX:1, scaleY:1.5 + Utils.RandF(5) / 10, ease:ExpoInOut } );
-			TweenLite.to(this, 0.1, { scaleX:1, scaleY:1.5 + Utils.RandF(5) / 10, ease:ExpoInOut, delay:0.1} );		
+			TweenLite.to(this, 0.1, { scaleX:1, scaleY:1.2 + Utils.RandF(5) / 10, ease:ExpoInOut } );
+			//TweenLite.to(this, 0.1, { scaleX:1, scaleY:1, ease:ExpoInOut, delay:0.1} );		
 		}
 	}
 }
