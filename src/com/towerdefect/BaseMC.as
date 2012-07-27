@@ -38,8 +38,9 @@ package com.towerdefect
 			 * -	showOnCreate : Boolean = true		If should appear immediately after creation
 			 * -	rect : Rectangle = new Rectangle(0, 0, 0, 0)	Position and size
 			 * -	soundManager : SoundManager = null	Exemplar of SoundManager class
-			 * -	filters : Boolean = false			If should use some predefined filters that look like border
-			 * -	filterColor : uint = 0x000000		The color of that border
+			 * -	glowFilter : uint = no filter		If should use GlowFilter
+			 * -	bevelFilter : uint = no filter		If should use BevelFilter
+			 * -	dropShadowFilter : uint = no filter	If should use DropShadowFilter
 			 * -	useEvents : Boolean = false			If should react on mouse
 			 * -	mouseDownMethod : String = name		Method to be called on mouseDown
 			 * -	buttonMode : Boolean = false		Enable or not hand cursor
@@ -47,10 +48,7 @@ package com.towerdefect
              */
 		public function BaseMC(args:Object=null)
 		{
-			this.init = new Init(args);
-			this.sf = new DropShadowFilter();
-			this.gf = new GlowFilter();
-			this.bf = new BevelFilter();
+			this.init = new Init(args);			
 			this.name = init.getString("name", "baseMC");
 			this.opaque = init.getNumber("opaque", 1);
 			this.rect = init.getRectangle("rect", new Rectangle(0, 0, 0, 0));
@@ -58,10 +56,14 @@ package com.towerdefect
 			this.y = rect.y;
 			this.soundManager = init.getObject("soundManager", SoundManager) as SoundManager;
 			this.buttonMode = init.getBoolean("buttonMode", false);
-			this.filterColor = init.getColor("filterColor", uint(0x000000));
-			if (init.getBoolean("filters", false)) setFilters();
+			if (args.hasOwnProperty("glowFilter"))
+				addFilter("glow", init.getColor("glowFilter", 0x000000));
+			if (args.hasOwnProperty("bevelFilter"))
+				addFilter("bevel", init.getColor("bevelFilter", 0x000000));
+			if (args.hasOwnProperty("dropShadowFilter"))
+				addFilter("shadow", init.getColor("dropShadowFilter", 0x000000));
 			this.alpha = 0;			
-			if (init.getBoolean("useEvents", false))									//
+			if (init.getBoolean("useEvents", false))
 			{
 				addEventListener(MouseEvent.ROLL_OVER, mouseOver, false, 0, true);
 				addEventListener(MouseEvent.ROLL_OUT, mouseOut, false, 0, true);
@@ -73,6 +75,40 @@ package com.towerdefect
 			if (init.getBoolean("showOnCreate", true)) show();
 		}
 		
+		public function addFilter(type:String, color:uint):void
+		{
+			switch(type)
+			{
+				case "glow":
+					this.gf = new GlowFilter(color, 1, 3, 3, 1, 3);
+					var tmpF:Array = this.filters;
+					for (var i:int = 0; i < tmpF.length; i++) 
+						if (tmpF[i] is GlowFilter)
+							tmpF.splice(i, 1);
+					tmpF.push(gf);
+					this.filters = tmpF;
+					break;
+				case "bevel":
+					this.bf = new BevelFilter(3, 45, color);
+					tmpF = this.filters; 
+					for (i = 0; i < tmpF.length; i++) 
+						if (tmpF[i] is BevelFilter)
+							tmpF.splice(i, 1);
+					tmpF.push(bf);
+					this.filters = tmpF;
+					break;
+				case "shadow":
+					this.sf = new DropShadowFilter(4, 45, color);
+					tmpF = this.filters; 
+					for (i = 0; i < tmpF.length; i++) 
+						if (tmpF[i] is DropShadowFilter)
+							tmpF.splice(i, 1);
+					tmpF.push(sf);
+					this.filters = tmpF;
+					break;
+			}
+		}
+		
 		public function get method():String
 		{
 			return _mouseDownMethod;
@@ -81,6 +117,11 @@ package com.towerdefect
 		public function scale(from:Number, to:Number, time:Number = 0.3):void
 		{
 			TweenLite.fromTo(this, time, { scaleX: to }, { scaleY: to} );
+		}
+		
+		public function size(width:int, height:int, time:Number = 0.3):void
+		{
+			TweenLite.to(this, time, { width: width, height:height} );
 		}
 		
 		public function show(time:Number=0.3):void
@@ -110,20 +151,6 @@ package com.towerdefect
 		private function rem():void
 		{
 			this.parent.removeChild(this);
-		}
-	
-		private function setFilters():void
-		{
-			sf.angle=40;
-			sf.blurX=3;
-			sf.blurY=3;			
-			sf.quality=3;
-			bf.distance=1;
-			bf.blurX=2;
-			bf.blurY=2;
-			bf.highlightColor = filterColor;
-			bf.shadowColor = filterColor;
-			this.filters = [bf, sf];
 		}
 		
 		public function removeFilters():void

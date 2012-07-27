@@ -26,7 +26,7 @@
 		public static var clrYellow:uint=0xCB9121;
 		public static var clrSPenalty:String = "#776666";
 		
-		public static var clrSBlack:String = "#110000";
+		public static var clrSBlack:String = "#333333";
 		public static var clrSBBlue:String = "#6666DD";
 		public static var clrSBRed:String = "#AA4444";
 		/**

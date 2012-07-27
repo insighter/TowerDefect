@@ -47,7 +47,7 @@ package com.towerdefect
 				bitmap.alpha = init.getNumber("imageOpaque", 1);
 			}
 			//If no image passed, but rect isn't zero, fill it with solid color
-			else if (rect.width != 0 && rect.height != 0)
+			else if (rect.width != 0 && rect.height != 0 && args.hasOwnProperty("fillColor"))
 			{
 				graphics.beginFill(init.getColor("fillColor", 0x000000));
 				this.graphics.drawRect(0, 0, rect.width, rect.height);

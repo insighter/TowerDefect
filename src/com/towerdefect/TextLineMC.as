@@ -3,6 +3,7 @@ package com.towerdefect
 	import com.greensock.easing.ExpoInOut;
 	import com.greensock.TweenLite;
 	import flash.events.Event;
+	import flash.filters.GlowFilter;
 	import flash.text.Font;
 	import flash.text.FontStyle;
 	import flash.text.TextField;

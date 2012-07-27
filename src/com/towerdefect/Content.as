@@ -9,7 +9,7 @@
 		];
 		
 		public static var images:Array = [
-			new Image("fone.dop", 		"../images/main/dop.jpg"),	
+			new Image("fone.game", 		"../images/main/game.jpg"),	
 			new Image("fone.main", 		"../images/main/main.jpg"),
 			new Image("fone.field", 	"../images/main/field.jpg"),
 			

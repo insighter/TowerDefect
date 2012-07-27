@@ -17,25 +17,23 @@ package com.towerdefect
 		private var menuScreen:ImageMC;
 		private var gameScreen:ImageMC;
 		private var menu:Menu;
-		private var field:FieldMC;
+		private var field:Field;
 		private var soundManager:SoundManager;
 		private var contentLoader:ContentLoader;
 		private var images:Array;
 		private var xmlLoader:XMLLoader;
 		private var textColor:uint;
 		private const xmlUrl:String = "config/Main.xml";
-		private const maxFieldWidth:int = 600;
-		private const maxFieldHeight:int = 600;
-		private const minFieldWidth:int = 100;
-		private const minFieldHeight:int = 100;
-		private const maxGridCountX:int = 50;
-		private const maxGridCountY:int = 50;
-		private const minGridCountX:int = 1;
-		private const minGridCountY:int = 1;
 		private var xml:XML;
 		
 		public function Main():void 
 		{
+			this.addEventListener(Event.ADDED_TO_STAGE, onAdded);
+		}
+		
+		private function onAdded(e:Event):void 
+		{
+			removeEventListener(Event.ADDED_TO_STAGE, onAdded);
 			loadXML(xmlUrl);
 		}
 		
@@ -59,8 +57,7 @@ package com.towerdefect
 		private function init(e:Event = null):void 
 		{
 			stage.quality = StageQuality.BEST;
-			addEventListener(CustomEvent.CONTENT_LOADED, contentLoaded, false, 0, true);
-			addEventListener(CustomEvent.MENU, menuClick, false, 0, true);
+			initEvents();
 			soundManager = SoundManager.getInstance();
 			for each(var s:SoundC in Content.sounds)
 				soundManager.addExternalSound(s.path, s.name);
@@ -76,15 +73,42 @@ package com.towerdefect
 			addChild(contentLoader);
 		}
 		
+		private function initEvents():void
+		{
+			addEventListener(CustomEvent.CONTENT_LOADED, contentLoaded, false, 0, true);
+			addEventListener(CustomEvent.MENU, menuClick, false, 0, true);
+		}
+		
 		private function contentLoaded(e:CustomEvent):void
 		{
+			//Creating GAME SCREEN
+			gameScreen = new ImageMC( { 
+				image:Utils.getBMPByName(images, "fone.game"),
+				rect:new Rectangle(0, 0, stage.stageWidth, stage.stageHeight),
+				centerImage:false
+			} );
+			addChild(gameScreen);
+			field = new Field( {
+				showOnCreate:true,
+				image:Utils.getBMPByName(images, "fone.field"),
+				rect:new Rectangle(0, 50, 550, 550),
+				tileImages:Utils.getAllBMPByName(images, "tile."),
+				tileCountX:parseInt(xml.vars.@tileCountX),
+				tileCountY:parseInt(xml.vars.@tileCountY),
+				tileWidth:parseInt(xml.vars.@tileWidth),
+				tileHeight:parseInt(xml.vars.@tileHeight),
+				gridSpacing:parseInt(xml.vars.@gridSpacing),
+				centerImage:false
+			});
+			gameScreen.addChild(field);
+			
 			//Creating MAIN MENU SCREEN
 			menuScreen = new ImageMC( {
 				name:"menuScreen",
-				rect:new Rectangle(0, 0, 800, 600),
+				rect:new Rectangle(0, 0, stage.stageWidth, stage.stageHeight),
 				soundManager:soundManager,
-				image:Utils.getBMPByName(images, "fone.main"),
-				imageOpaque:1,
+				//image:Utils.getBMPByName(images, "fone.main"),
+				//imageOpaque:1,
 				centerImage:false
 			});
 			addChild(menuScreen);
@@ -97,36 +121,17 @@ package com.towerdefect
 			var title1:TextLineMC = new TextLineMC( {
 				text:"Tower",
 				rect:new Rectangle(100, 0, 0, 0),
-				fontSize:80,
+				fontSize:30,
 				fontColor:textColor
 			});
 			var title2:TextLineMC = new TextLineMC( {
-				text:"Defe<d{6ct}>",
-				rect:new Rectangle(500, 0, 0, 0),
-				fontSize:80,
+				text:"Defe<d{3ct}>",
+				rect:new Rectangle(220, 0, 0, 0),
+				fontSize:30,
 				fontColor:textColor
 			});
 			menuScreen.addChild(title1);
 			menuScreen.addChild(title2);
-			
-			//Creating GAME SCREEN
-			gameScreen = new ImageMC( { showOnCreate:false } );
-			addChild(gameScreen);
-			var W:int = Utils.matchInterval(parseInt(xml.vars.@fieldWidth), minFieldWidth, maxFieldWidth);
-			var H:int = Utils.matchInterval(parseInt(xml.vars.@fieldHeight), minFieldHeight, maxFieldHeight);
-			var gridX:int = Utils.matchInterval(parseInt(xml.vars.@gridCountX), minGridCountX, maxGridCountX);
-			var gridY:int = Utils.matchInterval(parseInt(xml.vars.@gridCountY), minGridCountY, maxGridCountY);
-			field = new FieldMC( {
-				//image:Utils.getBMPByName(images, "fone.field"),
-				fillColor:0x000000,
-				rect:new Rectangle(300, stage.stageHeight / 2, W, H),
-				tileImages:Utils.getAllBMPByName(images, "tile."),
-				gridCountX:gridX,
-				gridCountY:gridY,
-				centerImage:false
-			});
-			field.scale(1, 0, 0.3);
-			gameScreen.addChild(field);
 		}
 		
 		private function menuClick(e:CustomEvent):void
@@ -141,9 +146,8 @@ package com.towerdefect
 		private function startGame():void
 		{
 			menuScreen.hide(0.3, -50);
-			gameScreen.show(1);
-			TweenLite.to(field, 0.3, { scaleX:1, scaleY:1 } );
-			//field.tileField();
+			field.move(0, 50);
+			field.tileField();
 		}
 	}
 	

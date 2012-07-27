@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <menu>
 	<vars
-		x="550" y="420" direction="vertical"
+		x="570" y="420" direction="vertical"
 		buttonSpacing="0" textTopOffset="10" textBottomOffset="5"
 		currentItem="-1" itemAlpha="0.5" curItemAlpha="1" animationTime="0.3"
 	>
-		<font size="46" color="#CB4121" />
-		<glow color="#CB4121" alpha="0.5" blurX="25" blurY="20" strength="5" />
+		<font size="25" color="#BBBBBB" />
+		<glow color="#BBBBBB" alpha="0.4" blurX="15" blurY="20" strength="4" />
 	</vars>
 	 <item>
     <text>PLAY</text>
