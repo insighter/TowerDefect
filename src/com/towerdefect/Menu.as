@@ -97,12 +97,13 @@
 					id:i,
 					text:xml.item[i].text,
 					rect:new Rectangle(xx, yy, 0, 0),
-					fontAlign:TextFormatAlign.CENTER,
+					fontAlign:TextFormatAlign.JUSTIFY,
 					fontSize:menuParams.fontSize,
 					fontColor:menuParams.fontColor,
 					mouseDownMethod:xml.item[i].method,
-					useEvents:true,
-					buttonMode:true
+					dispatchEvents:true,
+					buttonMode:true,
+					mouseSpecialEffect: {deltaX:350, shiftX:20, deltaY:300, shiftY:100}
 				});
 				glf = new GlowFilter(menuParams.glowColor, 0, 0, 0, 2, BitmapFilterQuality.HIGH);
 				item.filters = [glf];
@@ -123,8 +124,8 @@
 		private function itemMouseOut(e:CustomEvent):void
 		{
 			var item:TextLineMC = e.args;			
-			TweenMax.to(item, menuParams.animationTime, {alpha:menuParams.itemAlpha, ease:SineOut, glowFilter:{alpha:0, strength:0, blurX:0, blurY:0}} );
-			if (mouseY < 0 || mouseY > this.height-20 || mouseX>item.width-20 || mouseX<0)
+			TweenMax.to(item, menuParams.animationTime, {ease:SineOut, glowFilter:{alpha:0, strength:0, blurX:0, blurY:0}} );
+			if (item.mouseY < 10 || item.mouseY > this.height-10 || item.mouseX>item.width-10 || item.mouseX<10)
 				changeItemsAlpha(null);
 		}			
 
@@ -153,10 +154,10 @@
 			if (activeItem == null)
 				for each(var I:TextLineMC in menuItems) 
 					TweenLite.to(I, menuParams.animationTime, { alpha:menuParams.curItemAlpha, ease:SineOut } );
-			else 
+			/*else 
 				for each(I in menuItems)
 					if (I != activeItem)
-						TweenLite.to(I, menuParams.animationTime, {alpha:menuParams.itemAlpha, ease:SineOut} );
+						TweenLite.to(I, menuParams.animationTime, {alpha:menuParams.itemAlpha, ease:SineOut} );*/
 		}
     }
 }

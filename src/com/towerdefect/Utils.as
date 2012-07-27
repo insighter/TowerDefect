@@ -26,13 +26,13 @@
 		public static var clrYellow:uint=0xCB9121;
 		public static var clrSPenalty:String = "#776666";
 		
-		public static var clrSBlack:String = "#333333";
+		public static var clrSBlack:String = "#111111";
 		public static var clrSBBlue:String = "#6666DD";
 		public static var clrSBRed:String = "#AA4444";
 		/**
          * Returns value if value is in interval, otherwise returns min if value < min or max if value > max
          */
-		public static function matchInterval(value:int, min:int, max:int):int
+		public static function matchInterval(value:Number, min:Number, max:Number):Number
 		{
 			if (value < min) return min;
 			if (value > max) return max;

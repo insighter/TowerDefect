@@ -1,16 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <menu>
 	<vars
-		x="570" y="420" direction="vertical"
+		x="310" y="240" direction="vertical"
 		buttonSpacing="0" textTopOffset="10" textBottomOffset="5"
 		currentItem="-1" itemAlpha="0.5" curItemAlpha="1" animationTime="0.3"
 	>
-		<font size="25" color="#BBBBBB" />
-		<glow color="#BBBBBB" alpha="0.4" blurX="15" blurY="20" strength="4" />
+		<font size="25" color="#000000" />
+		<glow color="#000000" alpha="1" blurX="25" blurY="30" strength="5" />
 	</vars>
 	 <item>
     <text>PLAY</text>
     <method>game</method>
+    <args></args>
+  </item>
+   <item>
+    <text>HIGH SCORES</text>
+    <method>hsco</method>
     <args></args>
   </item>
    <item>

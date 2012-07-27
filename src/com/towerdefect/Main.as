@@ -7,6 +7,7 @@ package com.towerdefect
 	import flash.events.Event;
 	import flash.geom.Rectangle;
 	import flash.system.fscommand;
+	import flash.text.TextFieldAutoSize;
 
 	/**
 	 * ...
@@ -14,8 +15,8 @@ package com.towerdefect
 	 */
 	public class Main extends Sprite 
 	{
-		private var menuScreen:ImageMC;
-		private var gameScreen:ImageMC;
+		private var menuScreen:BaseMC;
+		private var gameScreen:BaseMC;
 		private var menu:Menu;
 		private var field:Field;
 		private var soundManager:SoundManager;
@@ -82,28 +83,34 @@ package com.towerdefect
 		private function contentLoaded(e:CustomEvent):void
 		{
 			//Creating GAME SCREEN
-			gameScreen = new ImageMC( { 
+			gameScreen = new BaseMC( { 
 				image:Utils.getBMPByName(images, "fone.game"),
-				rect:new Rectangle(0, 0, stage.stageWidth, stage.stageHeight),
+				rect:new Rectangle(0, -200, stage.stageWidth, stage.stageHeight),
 				centerImage:false
 			} );
 			addChild(gameScreen);
+			gameScreen.scale(1, 1.6);
 			field = new Field( {
+				name:"field",
 				showOnCreate:true,
 				image:Utils.getBMPByName(images, "fone.field"),
-				rect:new Rectangle(0, 50, 550, 550),
+				rect:new Rectangle(75, 25, 550, 550),
 				tileImages:Utils.getAllBMPByName(images, "tile."),
 				tileCountX:parseInt(xml.vars.@tileCountX),
 				tileCountY:parseInt(xml.vars.@tileCountY),
 				tileWidth:parseInt(xml.vars.@tileWidth),
 				tileHeight:parseInt(xml.vars.@tileHeight),
 				gridSpacing:parseInt(xml.vars.@gridSpacing),
-				centerImage:false
+				centerImage:false,
+				animationScale:1.005,
+				animationTime:0.4,
+				forceAnimation:true,
+				mouseSpecialEffect:{deltaX:stage.stageWidth/2, deltaY:stage.stageHeight/2, shiftX:15, shiftY:15}
 			});
 			gameScreen.addChild(field);
 			
 			//Creating MAIN MENU SCREEN
-			menuScreen = new ImageMC( {
+			menuScreen = new BaseMC( {
 				name:"menuScreen",
 				rect:new Rectangle(0, 0, stage.stageWidth, stage.stageHeight),
 				soundManager:soundManager,
@@ -113,22 +120,24 @@ package com.towerdefect
 			});
 			addChild(menuScreen);
 			menu = new Menu( {
-				name:"main",
+				name:"mainMenu",
 				xmlUrl:"config/mainMenu.xml",
 				soundManager:soundManager
 			});
 			menuScreen.addChild(menu);
 			var title1:TextLineMC = new TextLineMC( {
-				text:"Tower",
-				rect:new Rectangle(100, 0, 0, 0),
-				fontSize:30,
-				fontColor:textColor
+			text:"{5T{4ower} D}{4efe<dct}>}",
+				rect:new Rectangle(300, 0, 0, 0),
+				fontColor:textColor,
+				dropShadowFilter:0x000000
 			});
 			var title2:TextLineMC = new TextLineMC( {
-				text:"Defe<d{3ct}>",
-				rect:new Rectangle(220, 0, 0, 0),
-				fontSize:30,
-				fontColor:textColor
+			text:"COPYRIGHT © 2012 BY INSIGHTER : ALL RIGHTS RESERVED",
+				rect:new Rectangle(150, 570, 0, 0),
+				fontColor:textColor,
+				textFieldAutoSize:TextFieldAutoSize.LEFT,
+				dropShadowFilter:0x000000,
+				mouseSpecialEffect: {deltaX:250, shiftX:30}
 			});
 			menuScreen.addChild(title1);
 			menuScreen.addChild(title2);
@@ -140,13 +149,18 @@ package com.towerdefect
 			{
 				case "quit": fscommand("quit"); break;
 				case "game": startGame(); break;
+				case "hsco": menu.deleteSpecialEffect(); break;
 			}
 		}
 		
 		private function startGame():void
 		{
 			menuScreen.hide(0.3, -50);
+			field.forceAnimation = false;
+			field.deleteSpecialEffect();
 			field.move(0, 50);
+			gameScreen.scale(1, 1);
+			gameScreen.move(0, 0);
 			field.tileField();
 		}
 	}

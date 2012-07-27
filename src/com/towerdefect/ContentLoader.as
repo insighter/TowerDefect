@@ -29,8 +29,8 @@
 		private var remainTMC:TextLineMC;
 		private var imagesTMC:TextLineMC;
 		private var progressTMC:TextLineMC;
-		private var progressBar:ImageMC;
-		private var emptyBar:ImageMC;
+		private var progressBar:BaseMC;
+		private var emptyBar:BaseMC;
 		private var init:Init;
 		/**
              * 
@@ -65,12 +65,12 @@
 			addChild(remainTMC);
 			//addChild(imagesTMC);
 			addChild(progressTMC);
-			emptyBar = new ImageMC( {
+			emptyBar = new BaseMC( {
 				image:emptyBarImage,
 				rect:new Rectangle(0, 100, 0, 0)
 			});
 			addChild(emptyBar);
-			progressBar = new ImageMC( {
+			progressBar = new BaseMC( {
 				image:progressBarImage,
 				rect:new Rectangle(0, 100, 0, 0)
 			});

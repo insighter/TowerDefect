@@ -12,12 +12,12 @@ package com.towerdefect
 	import flash.text.TextFormatAlign;
 	import flash.text.AntiAliasType;
 	/**
-         * TextLineMC = ImageMC + TextField = BaseMC + Image + TextField. Provides animation effect when text changes
+         * TextLineMC = BaseMC + TextField. Provides animation effect when text changes
          * *This TextField is single-line only
 		 * 
          * @author insighter
          */
-	public class TextLineMC extends ImageMC
+	public class TextLineMC extends BaseMC
 	{
 		private var textField:TextField;
 		private var tf:TextFormat;
@@ -39,7 +39,6 @@ package com.towerdefect
              */
 		public function TextLineMC(args:Object=null)
 		{
-			super(args);
 			this.init = new Init(args);
 			mouseChildren = false;
 			tf = new TextFormat();
@@ -47,17 +46,17 @@ package com.towerdefect
 			if (fontObj == null) fontObj = new mySegoePrint();
 			tf.font = fontObj.fontName;
 			tf.size = init.getInt("fontSize", 12);
-			tf.align = init.getString("fontAlign", "center");
 			textField = new TextField();
 			textField.textColor = init.getColor("fontColor", uint(0xFFFFFF));
 			textField.selectable = false;
-			textField.autoSize = TextFieldAutoSize.CENTER;
+			textField.autoSize = init.getString("textFieldAutoSize", TextFieldAutoSize.CENTER);
 			textField.multiline = false;
 			textField.embedFonts = false;
 			textField.defaultTextFormat = tf;
 			textField.htmlText = Utils.toHTML(init.getString("text", "No text"));
 			textField.antiAliasType = AntiAliasType.ADVANCED;
 			addChild(textField);
+			super(args);
 		}
 		
 		public function setText(text:String):void

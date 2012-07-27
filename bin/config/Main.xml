@@ -5,6 +5,6 @@
 		tileCountX="21" tileCountY="21"
 		gridSpacing="1"
 	>
-		<font size="56" color="#BBBBBB" />
+		<font size="56" color="#000000" />
 	</vars>
 </menu>
