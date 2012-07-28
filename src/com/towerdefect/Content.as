@@ -13,7 +13,13 @@
 			new Image("fone.main", 		"../images/main/main.jpg"),
 			new Image("fone.field", 	"../images/main/field.jpg"),
 			
+			new Image("fone.panelG", 	"../images/main/panelG.png"),
+			new Image("fone.panelS", 	"../images/main/panelS.png"),
+			new Image("fone.panelO", 	"../images/main/panelO.png"),
+			
 			new Image("tile.1", 		"../images/tile/tile_s1.jpg"),
+			
+			new Image("tower.1", 		"../images/tower/tower1.png"),
 			
 			new Image("circle.w", 		"../images/balls/circleW.png"),
 			new Image("circle.b", 		"../images/balls/circleB.png"),

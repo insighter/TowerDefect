@@ -25,7 +25,7 @@
 		public static var clrSYellow:String = "#CB9121";
 		public static var clrYellow:uint=0xCB9121;
 		public static var clrSPenalty:String = "#776666";
-		
+		public static var clrSWhite:String = "#666666";
 		public static var clrSBlack:String = "#111111";
 		public static var clrSBBlue:String = "#6666DD";
 		public static var clrSBRed:String = "#AA4444";
@@ -132,7 +132,8 @@
 						case 'r':TXT +=  "<font color='" + clrSBRed + 		"'>";break;
 						case 'b':TXT +=  "<font color='" + clrSBBlue + 		"'>";break;
 						case 'g':TXT +=  "<font color='" + clrSBGreen + 	"'>"; break;
-						case 'd':TXT +=  "<font color='" + clrSBlack + 	"'>";break;
+						case 'd':TXT +=  "<font color='" + clrSBlack + 	"'>"; break;
+						case 'w':TXT +=  "<font color='" + clrSWhite + 	"'>";break;
 					}				
 				}
 				else if (arr[0] == '{')

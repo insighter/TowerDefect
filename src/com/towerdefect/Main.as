@@ -5,6 +5,7 @@ package com.towerdefect
 	import flash.display.Sprite;
 	import flash.display.StageQuality;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
 	import flash.system.fscommand;
 	import flash.text.TextFieldAutoSize;
@@ -16,9 +17,15 @@ package com.towerdefect
 	public class Main extends Sprite 
 	{
 		private var menuScreen:BaseMC;
-		private var gameScreen:BaseMC;
 		private var menu:Menu;
+		
+		private var gameScreen:BaseMC;
 		private var field:Field;
+		private var panelG:BaseMC;//Game panel
+		private var panelS:BaseMC;//Stat panel
+		private var panelO:BaseMC;//Options panel
+		private var toolTip:AToolTip;
+		
 		private var soundManager:SoundManager;
 		private var contentLoader:ContentLoader;
 		private var images:Array;
@@ -82,14 +89,12 @@ package com.towerdefect
 		
 		private function contentLoaded(e:CustomEvent):void
 		{
-			//Creating GAME SCREEN
+			//Creating GAME SCREEN and it's childs
 			gameScreen = new BaseMC( { 
 				image:Utils.getBMPByName(images, "fone.game"),
 				rect:new Rectangle(0, -200, stage.stageWidth, stage.stageHeight),
 				centerImage:false
 			} );
-			addChild(gameScreen);
-			gameScreen.scale(1, 1.6);
 			field = new Field( {
 				name:"field",
 				showOnCreate:true,
@@ -107,26 +112,47 @@ package com.towerdefect
 				forceAnimation:true,
 				mouseSpecialEffect:{deltaX:stage.stageWidth/2, deltaY:stage.stageHeight/2, shiftX:15, shiftY:15}
 			});
+			panelG = new BaseMC( {
+				name:"panelG",
+				image:Utils.getBMPByName(images, "fone.panelG"),
+				imageCenter:true,
+				rect:new Rectangle(630, 326, 140, 550),
+				showOnCreate:false
+			});
+			panelS = new BaseMC( {
+				name:"panelS",
+				image:Utils.getBMPByName(images, "fone.panelS"),
+				imageCenter:true,
+				rect:new Rectangle(275, 20, 550, 40),
+				showOnCreate:false
+			});
+			panelO = new BaseMC( {
+				name:"panelO",
+				image:Utils.getBMPByName(images, "fone.panelO"),
+				imageCenter:true,
+				rect:new Rectangle(630, 20, 140, 40),
+				showOnCreate:false
+			});
 			gameScreen.addChild(field);
+			gameScreen.addChild(panelG);
+			gameScreen.addChild(panelS);
+			gameScreen.addChild(panelO);
+			addChild(gameScreen);
+			gameScreen.scale(1, 1.6);
 			
-			//Creating MAIN MENU SCREEN
+			//Creating MAIN MENU SCREEN and it's childs
 			menuScreen = new BaseMC( {
 				name:"menuScreen",
 				rect:new Rectangle(0, 0, stage.stageWidth, stage.stageHeight),
-				soundManager:soundManager,
-				//image:Utils.getBMPByName(images, "fone.main"),
-				//imageOpaque:1,
-				centerImage:false
+				soundManager:soundManager
 			});
-			addChild(menuScreen);
 			menu = new Menu( {
 				name:"mainMenu",
 				xmlUrl:"config/mainMenu.xml",
 				soundManager:soundManager
 			});
-			menuScreen.addChild(menu);
 			var title1:TextLineMC = new TextLineMC( {
-			text:"{5T{4ower} D}{4efe<dct}>}",
+			text:"{5T{4ower} D}{4efe<wct}>}",
 				rect:new Rectangle(300, 0, 0, 0),
 				fontColor:textColor,
 				dropShadowFilter:0x000000
@@ -139,8 +165,10 @@ package com.towerdefect
 				dropShadowFilter:0x000000,
 				mouseSpecialEffect: {deltaX:250, shiftX:30}
 			});
+			menuScreen.addChild(menu);
 			menuScreen.addChild(title1);
 			menuScreen.addChild(title2);
+			addChild(menuScreen);
 		}
 		
 		private function menuClick(e:CustomEvent):void
@@ -149,19 +177,61 @@ package com.towerdefect
 			{
 				case "quit": fscommand("quit"); break;
 				case "game": startGame(); break;
-				case "hsco": menu.deleteSpecialEffect(); break;
+				case "hsco": break;
 			}
 		}
 		
 		private function startGame():void
 		{
+			toolTip = new AToolTip( {
+				main:this,
+				opaque:0.85,
+				showDelay:400,
+				maxWidth:400,
+				textColor:0x555555,
+				bgColor:0x000000,
+				useShadow:true,
+				shadowColor:0x000000,
+				fontName:new mySegoePrint().fontName,
+				titleSize:14,
+				descriptionSize:12
+			});
+			assignToolTip();
 			menuScreen.hide(0.3, -50);
+			gameScreen.scale(1, 1);
+			gameScreen.move(0, 0);
 			field.forceAnimation = false;
 			field.deleteSpecialEffect();
 			field.move(0, 50);
-			gameScreen.scale(1, 1);
-			gameScreen.move(0, 0);
-			field.tileField();
+			field.addFilter("bevel", 0x222222);
+			panelG.show();
+			panelS.show();
+			panelO.show();
+			//field.tileField();
+			var cannon1:BaseMC = new BaseMC( {
+				image:Utils.getBMPByName(images, "tower.1"),
+				centerImage:true,
+				rect:new Rectangle(0, 200, 25, 25),
+				showOnCreate:true,
+				forceAnimation:true,
+				animationScale:1.2
+			});
+			panelG.addChild(cannon1);
+			cannon1.addEventListener(MouseEvent.MOUSE_DOWN, capture, false, 0, true);
+		}
+		
+		private function assignToolTip():void
+		{
+			toolTip.addToolTip( {
+				object:panelG,
+				title:"Игровая панель", 
+				description:"Проверка^ Это текст"
+			});
+		}
+		
+		private function capture(e:MouseEvent):void
+		{
+			field.cannon = e.currentTarget as BaseMC;
 		}
 	}
 	

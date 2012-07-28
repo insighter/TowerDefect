@@ -62,7 +62,7 @@ package com.towerdefect
 			 * -	forceAnimation:Boolean = false		Force animation process in spite of mouse position
 			 * -	animationScale : Number = 1		Scale of object for use in animation loop on MouseOver
 			 * -	animationTime : Number = 0.2
-			 * -	mouseSpecialEffect:Boolean = false	If set to TRUE, 'reactOnMouse' become TRUE
+			 * -	mouseSpecialEffect:Boolean = false		If set to TRUE, 'reactOnMouse' become TRUE
 			 * -	mouseDownMethod : String = name	Method to be called on mouseDown
 			 * 
 			 * -	image : BitmapData = null
@@ -140,6 +140,12 @@ package com.towerdefect
 		public function get method():String
 		{
 			return _mouseDownMethod;
+		}
+		
+		public function setOpaque(value:Number):void
+		{
+			opaque = value;
+			show();
 		}
 		
 		public function scale(valueX:Number, valueY:Number, time:Number = 0.3):void
@@ -222,8 +228,6 @@ package com.towerdefect
 				deltaY = this.height / 2;
 			var procentX:Number = (this.mouseX - xc) / deltaX;
 			var procentY:Number = (this.mouseY - yc) / deltaY;
-			if (name == "field")
-				trace(this.mouseX+" "+xc);
 			procentX = Utils.matchInterval(procentX, -1, 1);
 			procentY = Utils.matchInterval(procentY, -1, 1);
 			if(mouseSpecialEffect.hasOwnProperty("shiftX"))
@@ -285,7 +289,7 @@ package com.towerdefect
 					this.filters = tmpF;
 					break;
 				case "bevel":
-					this.bf = new BevelFilter(3, 45, color);
+					this.bf = new BevelFilter(1, 45, color, 1, color);
 					tmpF = this.filters; 
 					for (i = 0; i < tmpF.length; i++) 
 						if (tmpF[i] is BevelFilter)
