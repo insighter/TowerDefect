@@ -19,9 +19,6 @@ package com.towerdefect
          */
 	public class BaseMC extends MovieClip
 	{		
-		protected var sf:DropShadowFilter;
-		protected var gf:GlowFilter;
-		protected var bf:BevelFilter;
 		protected var opaque:Number;		
 		protected var rect:Rectangle; 
 		protected var soundManager:SoundManager;
@@ -40,6 +37,9 @@ package com.towerdefect
 		private var animationScale:Number;
 		private var animationTween:TweenMax;
 		private var animationTime:Number;
+		private var _dropShadowFilter:DropShadowFilter;
+		private var _glowFilter:GlowFilter;
+		private var _bevelFilter:BevelFilter;
 		private var init:Init;
 		/**
              * 
@@ -51,10 +51,10 @@ package com.towerdefect
 			 * -	rect : Rectangle = new Rectangle(0, 0, 0, 0)	Position and size
 			 * -	soundManager : SoundManager = null	Exemplar of SoundManager class
 			 * -	buttonMode : Boolean = false		Enables hand cursor on ROLL_OVER
-			 * -	xml : XML = null				Reference to main xml file
-			 * -	glowFilter : uint = no filter			If should use GlowFilter
-			 * -	bevelFilter : uint = no filter			If should use BevelFilter
-			 * -	dropShadowFilter : uint = no filter		If should use DropShadowFilter
+			 * -	xmlURL : String = null			Path to XML file to read parameters from (Not implemented yet)
+			 * -	glowFilter : GlowFilter = null
+			 * -	bevelFilter : BevelFilter = null
+			 * -	dropShadowFilter : DropShadowFilter = null
 			 * 
 			 * -	reactOnMouse : Boolean = false		If should respond on mouse actions
 			 * -	dispatchEvents : Boolean = false		If should dispatch CustomEvent on mouse actions. If set to TRUE, 'reactOnMouse' becomes TRUE.
@@ -80,13 +80,9 @@ package com.towerdefect
 			this.y = rect.y; this.y0 = y;
 			this.soundManager = init.getObject("soundManager", SoundManager) as SoundManager;
 			this.buttonMode = init.getBoolean("buttonMode", false);
-			if (args.hasOwnProperty("glowFilter"))
-				addFilter("glow", init.getColor("glowFilter", 0x000000));
-			if (args.hasOwnProperty("bevelFilter"))
-				addFilter("bevel", init.getColor("bevelFilter", 0x000000));
-			if (args.hasOwnProperty("dropShadowFilter"))
-				addFilter("shadow", init.getColor("dropShadowFilter", 0x000000));
-			this.alpha = 0;			
+			this.glowFilter = init.getObject("glowFilter", GlowFilter) as GlowFilter;
+			this.bevelFilter = init.getObject("bevelFilter", BevelFilter) as BevelFilter;
+			this.dropShadowFilter = init.getObject("dropShadowFilter", DropShadowFilter) as DropShadowFilter;
 			this._mouseDownMethod = init.getString("mouseDownMethod", this.name);
 			this.xml = init.getObject("xml", XML) as XML;
 			this.reactOnMouse = init.getBoolean("reactOnMouse", false);
@@ -134,6 +130,7 @@ package com.towerdefect
 			}
 			this.forceAnimation = init.getBoolean("forceAnimation", false);
 			this.visible = false;
+			this.alpha = 0;
 			if (init.getBoolean("showOnCreate", true)) show();
 		}
 		
@@ -275,38 +272,41 @@ package com.towerdefect
 			TweenMax.to(this, animationTime, { scaleX:1, scaleY:1, ease:BounceOut } );
 		}
 		
-		public function addFilter(type:String, color:uint):void
+		public function set glowFilter(gf:GlowFilter):void
 		{
-			switch(type)
-			{
-				case "glow":
-					this.gf = new GlowFilter(color, 1, 3, 3, 1, 3);
-					var tmpF:Array = this.filters;
-					for (var i:int = 0; i < tmpF.length; i++) 
-						if (tmpF[i] is GlowFilter)
-							tmpF.splice(i, 1);
-					tmpF.push(gf);
-					this.filters = tmpF;
-					break;
-				case "bevel":
-					this.bf = new BevelFilter(1, 45, color, 1, color);
-					tmpF = this.filters; 
-					for (i = 0; i < tmpF.length; i++) 
-						if (tmpF[i] is BevelFilter)
-							tmpF.splice(i, 1);
-					tmpF.push(bf);
-					this.filters = tmpF;
-					break;
-				case "shadow":
-					this.sf = new DropShadowFilter(10, 45, color, 1, 10, 10, 1, 3);
-					tmpF = this.filters; 
-					for (i = 0; i < tmpF.length; i++) 
-						if (tmpF[i] is DropShadowFilter)
-							tmpF.splice(i, 1);
-					tmpF.push(sf);
-					this.filters = tmpF;
-					break;
-			}
+			if (gf == null) return;
+			var F:Array = this.filters;
+			for (var i:int = 0; i < F.length; i++) 
+				if (F[i] is GlowFilter)
+					F.splice(i, 1);
+			this._glowFilter = gf;
+			F.push(_glowFilter);
+			this.filters = F;
+		}
+		
+		public function set bevelFilter(bf:BevelFilter):void
+		{
+			if (bf == null) return;
+			trace("here " + name);
+			var F:Array = this.filters;
+			for (var i:int = 0; i < F.length; i++) 
+				if (F[i] is BevelFilter)
+					F.splice(i, 1);
+			this._bevelFilter = bf;
+			F.push(_bevelFilter);
+			this.filters = F;
+		}
+		
+		public function set dropShadowFilter(sf:DropShadowFilter):void
+		{
+			if (sf == null) return;
+			var F:Array = this.filters;
+			for (var i:int = 0; i < F.length; i++) 
+				if (F[i] is DropShadowFilter)
+					F.splice(i, 1);
+			this._dropShadowFilter = sf;
+			F.push(_dropShadowFilter);
+			this.filters = F;
 		}
 	}
 	

@@ -10,8 +10,7 @@
 		
 		public static var images:Array = [
 			new Image("fone.game", 		"../images/main/game.jpg"),	
-			new Image("fone.main", 		"../images/main/main.jpg"),
-			new Image("fone.field", 	"../images/main/field.jpg"),
+			new Image("fone.field", 	"../images/main/field.png"),
 			
 			new Image("fone.panelG", 	"../images/main/panelG.png"),
 			new Image("fone.panelS", 	"../images/main/panelS.png"),
