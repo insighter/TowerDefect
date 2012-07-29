@@ -40,8 +40,6 @@ package com.towerdefect
 		private var phase:GamePhase;
 		private var rhytmTimer:Timer;
 		private var minStepCount:int = 8;
-		private var aTower:Tower;
-		private var bTower:Tower;
 		private var towers:Array;
 		private var grid:BaseMC;
 		private var tiles:Array;
@@ -219,9 +217,9 @@ package com.towerdefect
 		
 		private function assignToolTip():void
 		{
-			toolTip.addToolTip( { object:panelG,	title:"Игровая панель", description:"Проверка^ Это текст" } );
-			toolTip.addToolTip( { object:panelS,	title:"Панель информации", description:"Пу{025сто}", bgColor:0x555555, textColor:0x000000, bevelFilter:new BevelFilter(1, 45, 0xFFFFFF, 1, 0xFFFFFF, 1, 0, 0, 1, 3) } );
-			toolTip.addToolTip( { object:panelO,	title:"Панель правая, <rверхняя> =)", description:"<gДобавить> кнопку настроек^<gДобавить> управление громкостью" } );
+			toolTip.addToolTip( { object:panelG,	title:"Игровая панель", text:"Проверка^ Это текст" } );
+			toolTip.addToolTip( { object:panelS,	title:"Панель информации", text:"Пу{025сто}", bgColor:0x555555, textColor:0x000000, bevelFilter:new BevelFilter(1, 45, 0xFFFFFF, 1, 0xFFFFFF, 1, 0, 0, 1, 3) } );
+			toolTip.addToolTip( { object:panelO,	title:"Панель правая, <rверхняя> =)", text:"<gДобавить> кнопку настроек^<gДобавить> управление громкостью" } );
 		}
 		
 		private function menuClick(e:CustomEvent):void
@@ -253,6 +251,7 @@ package com.towerdefect
 			rhytmTimer = new Timer(25, 320);
 			rhytmTimer.addEventListener(TimerEvent.TIMER, nextSoundStep, false, 0, true);
 			rhytmTimer.start();
+			soundManager.fadeSound("mainTheme", 0, 3);
 		}
 		
 		private function createTiles():void
@@ -351,56 +350,61 @@ package com.towerdefect
 			if (!phase.constructionMode) return;
 			lastNode = e.currentTarget as TileMC;
 			towers = new Array();
-			aTower = new Tower( {
-				name:"aTower",
-				image:Utils.getBMPByName(images, "tower.1"),
+			var tVolcano:TVolcano = new TVolcano( {
+				towerClass:Tower.volcanoK,
 				rect:new Rectangle(lastNode.x, lastNode.y-tileH, 24, 24),
-				buttonMode:true,
 				soundManager:soundManager,
 				rhytmTimer:rhytmTimer,
-				images:images,
-				field:field
+				images:images
 			});
-			field.addChild(aTower);
-			bTower = new Tower( {
-				name:"bTower",
-				image:Utils.getBMPByName(images, "tower.1"),
+			field.addChild(tVolcano);
+			var tCannon:TCannon = new TCannon( {
+				towerClass:Tower.cannonS,
 				rect:new Rectangle(lastNode.x+tileW, lastNode.y-tileH, 24, 24),
-				buttonMode:true,
+				soundManager:soundManager,
+				rhytmTimer:rhytmTimer,
+				images:images
+			});
+			field.addChild(tCannon);
+			var tbVolcano:TVolcano = new TVolcano( {
+				towerClass:Tower.volcanoK,
+				rect:new Rectangle(12, 12, 24, 24),
 				soundManager:soundManager,
 				rhytmTimer:rhytmTimer,
 				images:images,
-				field:field
+				muted:true
 			});
-			var aaTower:Tower=new Tower( {
-				name:"aTower",
-				image:Utils.getBMPByName(images, "tower.1"),
-				rect:new Rectangle(0, 0, 24, 24),
-				buttonMode:true,
+			var tbCannon:TCannon = new TCannon( {
+				towerClass:Tower.cannonS,
+				rect:new Rectangle(12, 12, 24, 24),
 				soundManager:soundManager,
 				rhytmTimer:rhytmTimer,
 				images:images,
-				field:field
+				muted:true
 			});
-			//aaTower.build(0);
-			toolTip.addToolTip( { object:aTower,	title:"<rВулкан 1>", description:"Выплёвывает окаменевшую лаву, доставляя неудобство прохожим.^<gСтоимость:> 3$^<gЗвучание:> Kick^<gСкорострельность:> 1/8", icon:Utils.getBMPByName(images, "tower.1") });
-			toolTip.addToolTip( { object:bTower,	title:"<rВулкан 2>", description:"Тут должен быть другой вулкан.^<gСтоимость:> 4$^<gЗвучание:> Snare^<gСкорострельность:> 1/8", icon:Utils.getBMPByName(images, "tower.1") });
-			field.addChild(bTower);
-			towers.push(aTower);
-			towers.push(bTower);
-			aTower.addEventListener(MouseEvent.MOUSE_DOWN, buildTower, false, 0, true);
-			bTower.addEventListener(MouseEvent.MOUSE_DOWN, buildTower, false, 0, true);
+			tbVolcano.build(true, 0);
+			tbCannon.build(true, 0);
+			toolTip.addToolTip( { object:tVolcano,	title:"<r"+Tower.volcanoK.title+">", text:tbVolcano.paramInfo(), icon:tbVolcano });
+			toolTip.addToolTip( { object:tCannon,	title:"<r"+Tower.cannonS.title+">", text:tbCannon.paramInfo(), icon:tbCannon });
+			towers.push(tVolcano);
+			towers.push(tCannon);
+			tVolcano.addEventListener(MouseEvent.MOUSE_DOWN, buildTower, false, 0, true);
+			tCannon.addEventListener(MouseEvent.MOUSE_DOWN, buildTower, false, 0, true);
 		}
 		
 		private function buildTower(e:MouseEvent):void
 		{
 			var tower:Tower = e.currentTarget as Tower;
 			for each(var t:Tower in towers)
+			{
+				toolTip.removeToolTip(t);
+				t.active = false;
 				if (t != tower)
 					field.removeChild(t);
+			}
 			var curStep:int = Math.round(rhytmTimer.currentCount * 25 / 125 / minStepCount);
 			tower.move(lastNode.x, lastNode.y);
-			tower.build(curStep);
+			tower.build(true, curStep);
 		}
 		
 		private function nextSoundStep(e:TimerEvent):void
