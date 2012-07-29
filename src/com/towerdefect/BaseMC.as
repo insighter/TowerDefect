@@ -25,6 +25,7 @@ package com.towerdefect
 		protected var _mouseDownMethod:String;
 		protected var xml:XML;
 		protected var bitmap:Bitmap;
+		public var images:Array;
 		private var xc:int=0;	//visual center x
 		private var yc:int = 0;	//visual center y
 		private var x0:int;		//initial x
@@ -69,10 +70,12 @@ package com.towerdefect
 			 * -	imageOpaque : Number = 1
 			 * -	centerImage : Boolean = true		Whether or not center image
 			 * -	fillColor : uint = 0x000000			Fill movie clip with solid color instead of using image
+			 * -	images : Array		Reference to the array of all preloaded images of main class
              */
 		public function BaseMC(args:Object=null)
 		{
-			this.init = new Init(args);			
+			this.init = new Init(args);
+			this.images = init.getArray("images");
 			this.name = init.getString("name", "baseMC");
 			this.opaque = init.getNumber("opaque", 1);
 			this.rect = init.getRectangle("rect", new Rectangle(0, 0, 0, 0));
@@ -147,6 +150,11 @@ package com.towerdefect
 		
 		public function scale(valueX:Number, valueY:Number, time:Number = 0.3):void
 		{
+			if (time == 0)
+			{
+				scaleX = valueX;
+				scaleY = valueY;
+			}
 			TweenLite.to(this, time, { scaleX: valueX, scaleY: valueY} );
 		}
 		
@@ -287,7 +295,6 @@ package com.towerdefect
 		public function set bevelFilter(bf:BevelFilter):void
 		{
 			if (bf == null) return;
-			trace("here " + name);
 			var F:Array = this.filters;
 			for (var i:int = 0; i < F.length; i++) 
 				if (F[i] is BevelFilter)

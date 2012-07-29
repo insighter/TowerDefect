@@ -13,8 +13,6 @@
 	import flash.net.URLRequest;
 	import flash.utils.Timer;
 	/**
-         * ContentLoader loads 
-		 * using predefined border filters
          *
          * @author insighter
          */
@@ -24,10 +22,8 @@
 		private var timer:Timer=new Timer(50, 10000);
 		private var bytesTotal:Array=new Array();
 		private var bytesLoaded:Array = new Array();	
-		private var images:Array;
 		private var loadedTMC:TextLineMC;
 		private var remainTMC:TextLineMC;
-		private var imagesTMC:TextLineMC;
 		private var progressTMC:TextLineMC;
 		private var progressBar:BaseMC;
 		private var emptyBar:BaseMC;
@@ -35,47 +31,28 @@
 		/**
              * 
              * @param	args [optional]	An initialisation object for specifying default instance properties.
-			 * -	Arguments of initialisation object that will be catched by this constructor:
-			 * -	source : Array = []		Array of 'Image' class instances.
+			 * -	images : Array = []		Array of 'Image' class instances, that passed to BaseMC constructor.
 			 * -				At this moment each instance of Image class in this array should have two variables:
 			 * -				name:String and path:String, where path is valid path to image file.
 			 * -				Once image file is loaded using path variable, image variable 
 			 * -				(the third variable of Image class instance) will be updated with loaded BitmapData.
 			 * -	textColor : uint = 0xFFFFFF	The color to be passed to the text fields
-			 * -	progressBarImage : BitmapData = null
-			 * -	emptyBarImage : BitmapData = null
 			 * -	
              */
 		public function ContentLoader(args:Object=null)
 		{
 			super(args);
 			init = new Init(args);
-			images = init.getArray("source");
-			var progressBarImage:BitmapData = init.getBitmap("progressBarImage");
-			var emptyBarImage:BitmapData = init.getBitmap("emptyBarImage");
 			var textColor:uint = init.getColor("textColor", 0xFFFFFF);
 			timer.addEventListener(TimerEvent.TIMER, tick);
 			timer.reset();
 			timer.start();						
 			loadedTMC = new TextLineMC( { rect:new Rectangle(-50, 0, 0, 0), fontColor:textColor} );
 			remainTMC = new TextLineMC( { rect:new Rectangle(-50, 30, 0, 0), fontColor:textColor} );
-			imagesTMC = new TextLineMC( { rect:new Rectangle(-50, -30, 0, 0), fontColor:textColor} );
 			progressTMC = new TextLineMC( { rect:new Rectangle(-50, 60, 0, 0), fontColor:textColor} );
 			addChild(loadedTMC);
 			addChild(remainTMC);
-			//addChild(imagesTMC);
 			addChild(progressTMC);
-			emptyBar = new BaseMC( {
-				image:emptyBarImage,
-				rect:new Rectangle(0, 100, 0, 0)
-			});
-			addChild(emptyBar);
-			progressBar = new BaseMC( {
-				image:progressBarImage,
-				rect:new Rectangle(0, 100, 0, 0)
-			});
-			addChild(progressBar);
-			
 			load();
 		}		
 		
@@ -122,7 +99,6 @@
 			loadedTMC.setText("Загружено: " + (int(loaded / 1000)).toString() + " кб");
 			remainTMC.setText("Осталось: " + (int(toLoad / 1000)).toString() + " кб");
 			progressTMC.setText(progress.toString() + "%");
-			imagesTMC.setText("Файлов: " + images.length.toString());
 			
 			for each(var c:Image in images)
 				if(c.image==null)

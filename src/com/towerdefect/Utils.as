@@ -28,7 +28,7 @@
 		public static var clrSWhite:String = "#666666";
 		public static var clrSBlack:String = "#111111";
 		public static var clrSBBlue:String = "#6666DD";
-		public static var clrSBRed:String = "#AA4444";
+		public static var clrSBRed:String = "#993333";
 		/**
          * Returns value if value is in interval, otherwise returns min if value < min or max if value > max
          */

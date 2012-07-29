@@ -7,6 +7,7 @@ package com.towerdefect
 	import flash.display.StageQuality;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.events.TimerEvent;
 	import flash.filters.BevelFilter;
 	import flash.filters.DropShadowFilter;
 	import flash.filters.GlowFilter;
@@ -23,16 +24,12 @@ package com.towerdefect
 	{
 		private var menuScreen:BaseMC;
 		private var menu:Menu;
-		
 		private var gameScreen:BaseMC;
-		private var field:Field;
-		private var fieldW:int;
-		private var fieldH:int;
+		private var field:BaseMC;
 		private var panelG:BaseMC;//Game panel
 		private var panelS:BaseMC;//Stat panel
 		private var panelO:BaseMC;//Options panel
 		private var toolTip:AToolTip;
-		
 		private var soundManager:SoundManager;
 		private var contentLoader:ContentLoader;
 		private var images:Array;
@@ -41,6 +38,30 @@ package com.towerdefect
 		private const xmlUrl:String = "config/Main.xml";
 		private var xml:XML;
 		private var phase:GamePhase;
+		private var rhytmTimer:Timer;
+		private var minStepCount:int = 8;
+		private var aTower:Tower;
+		private var bTower:Tower;
+		private var towers:Array;
+		private var grid:BaseMC;
+		private var tiles:Array;
+		private var _startNode:INode;
+		private var _endNode:INode;
+		private const maxFieldWidth:int = 550;
+		private const maxFieldHeight:int = 550;
+		private const minFieldWidth:int = 100;
+		private const minFieldHeight:int = 100;
+		private const maxGridCountX:int = 50;
+		private const maxGridCountY:int = 50;
+		private const minGridCountX:int = 1;
+		private const minGridCountY:int = 1;
+		private var lastNode:INode;
+		private var lastTower:ITower;
+		private var tileW:int;
+		private var tileH:int;
+		private var tileCountX:int;
+		private var tileCountY:int;
+		private var gridSpacing:int;
 		
 		public function Main():void 
 		{
@@ -67,6 +88,11 @@ package com.towerdefect
 			xmlLoader.removeEventListener(CustomEvent.XML_LOADED, XMLLoaded);  
 			xml = xmlLoader.xml;
 			this.textColor = xml.vars.font.@color.toString().replace("#", "0x");
+			this.tileW = parseInt(xml.vars.@tileWidth);
+			this.tileH = parseInt(xml.vars.@tileHeight);
+			this.gridSpacing = parseInt(xml.vars.@gridSpacing);
+			this.tileCountX = parseInt(xml.vars.@tileCountX);
+			this.tileCountY = parseInt(xml.vars.@tileCountY);
 			init();
 		}
 		
@@ -79,13 +105,13 @@ package com.towerdefect
 			phase = new GamePhase();
 			for each(var s:SoundC in Content.sounds)
 				soundManager.addExternalSound(s.path, s.name);
-			//soundManager.playSound("mainTheme", 0.8);
+			soundManager.playSound("mainTheme", 0.8);
 
 			images = Content.images;
 			contentLoader = new ContentLoader( {
 				rect:new Rectangle(stage.stageWidth/2, 300, 0, 0),
 				name:"mainContentLoader",
-				source:images,
+				images:images,
 				textColor:textColor
 			});
 			addChild(contentLoader);
@@ -93,33 +119,32 @@ package com.towerdefect
 		
 		private function contentLoaded(e:CustomEvent):void
 		{
+			//Creating main AToolTip object that will manage all tooltips
+			toolTip = new AToolTip( {
+				main:this,
+				opaque:0.85,
+				showDelay:400,
+				maxWidth:200,
+				textColor:0x555555,
+				bgColor:0x000000,
+				fontName:new mySegoePrint().fontName,
+				titleSize:14,
+				descriptionSize:12,
+				bevelFilter:new BevelFilter(1, 45, 0x666666, 1, 0x666666, 1, 0, 0),
+				dropShadowFilter:new DropShadowFilter(5, 45, 0x000000, 1, 4, 4, 1, 3)
+			});
+			
 			//Creating GAME SCREEN and it's childs
 			gameScreen = new BaseMC( { 
 				image:Utils.getBMPByName(images, "fone.game"),
 				rect:new Rectangle(0, -200, stage.stageWidth, stage.stageHeight),
 				centerImage:false
 			} );
-			var tileW:int = parseInt(xml.vars.@tileWidth);
-			var tileH:int = parseInt(xml.vars.@tileHeight);
-			var gridS:int = parseInt(xml.vars.@gridSpacing);
-			var tileCX:int = parseInt(xml.vars.@tileCountX);
-			var tileCY:int = parseInt(xml.vars.@tileCountY);
-			fieldW = (tileW + gridS) * tileCX - gridS;
-			fieldH = (tileH + gridS) * tileCY - gridS;
-			field = new Field( {
+			field = new BaseMC( {
 				name:"field",
-				images:images,
 				phase:phase,
-				showOnCreate:true,
-				soundManager:soundManager,
 				image:Utils.getBMPByName(images, "fone.field"),
-				rect:new Rectangle(350, 300, fieldW, fieldH),
-				tileImages:Utils.getAllBMPByName(images, "tile."),
-				tileCountX:tileCX,
-				tileCountY:tileCY,
-				tileWidth:tileW,
-				tileHeight:tileH,
-				gridSpacing:gridS,
+				rect:new Rectangle(350, 300, (tileW + gridSpacing) * tileCountX - gridSpacing, (tileH + gridSpacing) * tileCountY - gridSpacing),
 				animationScale:1.005,
 				animationTime:1.4,
 				forceAnimation:true,
@@ -169,7 +194,10 @@ package com.towerdefect
 				rect:new Rectangle(300, 0, 0, 0),
 				fontSize:40,
 				fontColor:textColor,
-				dropShadowFilter:new DropShadowFilter(10, 45, 0x000000, 1, 10, 10, 1, 3)
+				dropShadowFilter:new DropShadowFilter(10, 45, 0x000000, 1, 10, 10, 1, 3),
+				animationScale:1.01,
+				animationTime:0.01,
+				forceAnimation:true
 			});
 			var title2:TextLineMC = new TextLineMC( {
 			text:"COPYRIGHT © 2012 BY INSIGHTER : ALL RIGHTS RESERVED",
@@ -184,6 +212,16 @@ package com.towerdefect
 			menuScreen.addChild(title2);
 			addChild(menuScreen);
 			phase.mainPhase = "menu";
+			createTiles();
+			enableTiles();
+			assignToolTip();			
+		}
+		
+		private function assignToolTip():void
+		{
+			toolTip.addToolTip( { object:panelG,	title:"Игровая панель", description:"Проверка^ Это текст" } );
+			toolTip.addToolTip( { object:panelS,	title:"Панель информации", description:"Пу{025сто}", bgColor:0x555555, textColor:0x000000, bevelFilter:new BevelFilter(1, 45, 0xFFFFFF, 1, 0xFFFFFF, 1, 0, 0, 1, 3) } );
+			toolTip.addToolTip( { object:panelO,	title:"Панель правая, <rверхняя> =)", description:"<gДобавить> кнопку настроек^<gДобавить> управление громкостью" } );
 		}
 		
 		private function menuClick(e:CustomEvent):void
@@ -198,42 +236,182 @@ package com.towerdefect
 		
 		private function startGame():void
 		{
-			toolTip = new AToolTip( {
-				main:this,
-				opaque:0.85,
-				showDelay:400,
-				maxWidth:400,
-				textColor:0x555555,
-				bgColor:0x000000,
-				fontName:new mySegoePrint().fontName,
-				titleSize:14,
-				descriptionSize:12,
-				bevelFilter:new BevelFilter(1, 45, 0x666666, 1, 0x666666, 1, 0, 0),
-				dropShadowFilter:new DropShadowFilter(5, 45, 0x000000, 1, 4, 4, 1, 3)
-			});
-			assignToolTip();
 			menuScreen.hide(0.3, -50);
 			gameScreen.scale(1, 1);
 			gameScreen.move(0, 0);
 			field.forceAnimation = false;
 			field.deleteSpecialEffect();
-			field.move(fieldW/2, fieldH/2+(stage.stageHeight-fieldH));
+			field.move(field.width/2, field.height/2+(stage.stageHeight-field.height));
 			field.bevelFilter = new BevelFilter(1, 45, 0x222222, 1, 0x222222);
-			field.startGame();
-			field.hideNodes();
-			field.mouseNodes(true);
+			hideTiles();
+			mouseTiles(true);
 			phase.constructionMode = true;
 			phase.mainPhase = "game";
 			panelG.show();
 			panelS.show();
 			panelO.show();
+			rhytmTimer = new Timer(25, 320);
+			rhytmTimer.addEventListener(TimerEvent.TIMER, nextSoundStep, false, 0, true);
+			rhytmTimer.start();
 		}
 		
-		private function assignToolTip():void
+		private function createTiles():void
 		{
-			toolTip.addToolTip( { object:panelG,	title:"Игровая панель", description:"Проверка^ Это текст" } );
-			toolTip.addToolTip( { object:panelS,	title:"Панель информации", description:"Пу{025сто}", bgColor:0x555555, textColor:0x000000, bevelFilter:new BevelFilter(1, 45, 0xFFFFFF, 1, 0xFFFFFF, 1, 0, 0, 1, 3) } );
-			toolTip.addToolTip( { object:panelO,	title:"Панель правая, <rверхняя> =)", description:"<gДобавить> кнопку настроек^<gДобавить> управление громкостью" } );
+			tiles = new Array();
+			for (var i:int = 0; i < tileCountY; i++)
+				for (var j:int = 0; j < tileCountX; j++)
+				{
+					var t:TileMC=new TileMC( {
+						name:"tile." + String(i * tileCountY + j + 1),
+						image:Utils.getBMPByName(images, "tile.1"),
+						opaque:0.4,
+						row:i+1,
+						col:j+1,
+						rect:new Rectangle( -field.width / 2 + j * (tileW + gridSpacing) + tileW / 2, -field.height / 2 + i * (tileH + gridSpacing) + tileH / 2, tileW, tileH)
+					});
+					tiles.push(t);
+					field.addChild(t); 
+				}
+		}
+		
+		private function buildGrid():void
+		{
+			/*grid = new BaseMC( {
+				rect:new Rectangle((this.width-GRID_WIDTH)/2, (this.height-GRID_HEIGHT)/2, GRID_WIDTH, GRID_HEIGHT)
+			});
+			addChild(grid);
+			grid.graphics.lineStyle(1, 0xFF0000);
+			for (var i:int = 0; i <= tileCountY; i++)
+			{
+				grid.graphics.moveTo(0, stepY * i-0.5);
+				grid.graphics.lineTo(stepX*tileCountX, stepY * i-0.5);
+			}
+			for (i = 0; i <= tileCountX; i++)
+			{
+				grid.graphics.moveTo(stepX * i-0.5, 0);
+				grid.graphics.lineTo(stepX * i-0.5, stepY*tileCountY);
+			}*/
+		}
+		
+		public function enableTiles():void
+		{
+			for each(var t:TileMC in tiles)
+			{
+				t.addEventListener(MouseEvent.ROLL_OVER, onTileOver, false, 0, true);
+				t.addEventListener(MouseEvent.ROLL_OUT, onTileOut, false, 0, true);
+				t.addEventListener(MouseEvent.MOUSE_DOWN, onTileClick, false, 0, true);				
+			}
+		}
+		
+		public function disableTiles():void
+		{
+			for each(var t:TileMC in tiles)
+			{
+				t.removeEventListener(MouseEvent.ROLL_OVER, onTileOver);
+				t.removeEventListener(MouseEvent.ROLL_OUT, onTileOut);
+				t.removeEventListener(MouseEvent.MOUSE_DOWN, onTileClick);				
+			}			
+		}
+		
+		public function mouseTiles(on:Boolean):void
+		{
+			for each(var t:TileMC in tiles)
+				t.buttonMode = on;
+		}
+		
+		public function showTiles():void
+		{
+			for each(var t:TileMC in tiles)
+				t.setOpaque(0.4);
+		}
+		
+		public function hideTiles():void
+		{
+			for each(var t:TileMC in tiles)
+				t.setOpaque(0);
+		}
+		
+		private function onTileOver(e:MouseEvent):void 
+		{
+			var node:TileMC = e.currentTarget as TileMC;
+			node.setOpaque(0.5);
+			if (phase.mainPhase == "menu")
+				soundManager.playSound("tileOver");
+		}
+		
+		private function onTileOut(e:MouseEvent):void 
+		{
+			var node:TileMC = e.currentTarget as TileMC;
+			node.setOpaque(0);
+			if (node != _startNode && node != _endNode) node.removeFilters();
+		}
+		
+		private function onTileClick(e:MouseEvent):void
+		{
+			if (!phase.constructionMode) return;
+			lastNode = e.currentTarget as TileMC;
+			towers = new Array();
+			aTower = new Tower( {
+				name:"aTower",
+				image:Utils.getBMPByName(images, "tower.1"),
+				rect:new Rectangle(lastNode.x, lastNode.y-tileH, 24, 24),
+				buttonMode:true,
+				soundManager:soundManager,
+				rhytmTimer:rhytmTimer,
+				images:images,
+				field:field
+			});
+			field.addChild(aTower);
+			bTower = new Tower( {
+				name:"bTower",
+				image:Utils.getBMPByName(images, "tower.1"),
+				rect:new Rectangle(lastNode.x+tileW, lastNode.y-tileH, 24, 24),
+				buttonMode:true,
+				soundManager:soundManager,
+				rhytmTimer:rhytmTimer,
+				images:images,
+				field:field
+			});
+			var aaTower:Tower=new Tower( {
+				name:"aTower",
+				image:Utils.getBMPByName(images, "tower.1"),
+				rect:new Rectangle(0, 0, 24, 24),
+				buttonMode:true,
+				soundManager:soundManager,
+				rhytmTimer:rhytmTimer,
+				images:images,
+				field:field
+			});
+			//aaTower.build(0);
+			toolTip.addToolTip( { object:aTower,	title:"<rВулкан 1>", description:"Выплёвывает окаменевшую лаву, доставляя неудобство прохожим.^<gСтоимость:> 3$^<gЗвучание:> Kick^<gСкорострельность:> 1/8", icon:Utils.getBMPByName(images, "tower.1") });
+			toolTip.addToolTip( { object:bTower,	title:"<rВулкан 2>", description:"Тут должен быть другой вулкан.^<gСтоимость:> 4$^<gЗвучание:> Snare^<gСкорострельность:> 1/8", icon:Utils.getBMPByName(images, "tower.1") });
+			field.addChild(bTower);
+			towers.push(aTower);
+			towers.push(bTower);
+			aTower.addEventListener(MouseEvent.MOUSE_DOWN, buildTower, false, 0, true);
+			bTower.addEventListener(MouseEvent.MOUSE_DOWN, buildTower, false, 0, true);
+		}
+		
+		private function buildTower(e:MouseEvent):void
+		{
+			var tower:Tower = e.currentTarget as Tower;
+			for each(var t:Tower in towers)
+				if (t != tower)
+					field.removeChild(t);
+			var curStep:int = Math.round(rhytmTimer.currentCount * 25 / 125 / minStepCount);
+			tower.move(lastNode.x, lastNode.y);
+			tower.build(curStep);
+		}
+		
+		private function nextSoundStep(e:TimerEvent):void
+		{			
+			if (rhytmTimer.currentCount * 25 % 1000 == 0)
+				soundManager.playSound("tick");
+			if (rhytmTimer.currentCount == 40*8)
+			{	
+				rhytmTimer.reset();
+				rhytmTimer.start();
+			}
 		}
 	}
 }
