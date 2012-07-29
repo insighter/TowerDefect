@@ -13,6 +13,7 @@ package com.towerdefect
 	import flash.geom.Rectangle;
 	import flash.system.fscommand;
 	import flash.text.TextFieldAutoSize;
+	import flash.utils.Timer;
 
 	/**
 	 * ...
@@ -79,7 +80,7 @@ package com.towerdefect
 			for each(var s:SoundC in Content.sounds)
 				soundManager.addExternalSound(s.path, s.name);
 			//soundManager.playSound("mainTheme", 0.8);
-				
+
 			images = Content.images;
 			contentLoader = new ContentLoader( {
 				rect:new Rectangle(stage.stageWidth/2, 300, 0, 0),
@@ -110,6 +111,7 @@ package com.towerdefect
 				images:images,
 				phase:phase,
 				showOnCreate:true,
+				soundManager:soundManager,
 				image:Utils.getBMPByName(images, "fone.field"),
 				rect:new Rectangle(350, 300, fieldW, fieldH),
 				tileImages:Utils.getAllBMPByName(images, "tile."),
@@ -118,11 +120,10 @@ package com.towerdefect
 				tileWidth:tileW,
 				tileHeight:tileH,
 				gridSpacing:gridS,
-				//centerImage:false,
 				animationScale:1.005,
 				animationTime:1.4,
 				forceAnimation:true,
-				mouseSpecialEffect:{deltaX:stage.stageWidth/2, deltaY:stage.stageHeight/2, shiftX:15, shiftY:15}
+				mouseSpecialEffect: { deltaX:stage.stageWidth / 2, deltaY:stage.stageHeight / 2, shiftX:15, shiftY:15 }
 			});
 			panelG = new BaseMC( {
 				name:"panelG",
@@ -164,8 +165,9 @@ package com.towerdefect
 				soundManager:soundManager
 			});
 			var title1:TextLineMC = new TextLineMC( {
-			text:"{5T{4ower} D}{4efe<wct}>}",
+			text:"{100S}ound {100R}esistance",
 				rect:new Rectangle(300, 0, 0, 0),
+				fontSize:40,
 				fontColor:textColor,
 				dropShadowFilter:new DropShadowFilter(10, 45, 0x000000, 1, 10, 10, 1, 3)
 			});
@@ -181,6 +183,7 @@ package com.towerdefect
 			menuScreen.addChild(title1);
 			menuScreen.addChild(title2);
 			addChild(menuScreen);
+			phase.mainPhase = "menu";
 		}
 		
 		private function menuClick(e:CustomEvent):void
@@ -216,9 +219,11 @@ package com.towerdefect
 			field.deleteSpecialEffect();
 			field.move(fieldW/2, fieldH/2+(stage.stageHeight-fieldH));
 			field.bevelFilter = new BevelFilter(1, 45, 0x222222, 1, 0x222222);
+			field.startGame();
 			field.hideNodes();
 			field.mouseNodes(true);
 			phase.constructionMode = true;
+			phase.mainPhase = "game";
 			panelG.show();
 			panelS.show();
 			panelO.show();
@@ -227,8 +232,8 @@ package com.towerdefect
 		private function assignToolTip():void
 		{
 			toolTip.addToolTip( { object:panelG,	title:"Игровая панель", description:"Проверка^ Это текст" } );
-			toolTip.addToolTip( { object:panelS,	title:"Панель информации", description:"Пусто", bgColor:0x555555, textColor:0x000000, bevelFilter:new BevelFilter(1, 45, 0xFFFFFF, 1, 0xFFFFFF, 1, 0, 0, 1, 3) } );
-			toolTip.addToolTip( { object:panelO,	title:"Панель правая, верхняя =)", description:"Добавить кнопку настроек^Добавить управление громкостью" } );
+			toolTip.addToolTip( { object:panelS,	title:"Панель информации", description:"Пу{025сто}", bgColor:0x555555, textColor:0x000000, bevelFilter:new BevelFilter(1, 45, 0xFFFFFF, 1, 0xFFFFFF, 1, 0, 0, 1, 3) } );
+			toolTip.addToolTip( { object:panelO,	title:"Панель правая, <rверхняя> =)", description:"<gДобавить> кнопку настроек^<gДобавить> управление громкостью" } );
 		}
 	}
 }

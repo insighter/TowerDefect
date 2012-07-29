@@ -138,17 +138,8 @@
 				}
 				else if (arr[0] == '{')
 				{
-					arr.shift();
-					switch (arr[0])
-					{
-						case '0':TXT +=  "<font size='10'>"; break;
-						case '1':TXT +=  "<font size='12'>";break;
-						case '2':TXT +=  "<font size='15'>";break;
-						case '3':TXT +=  "<font size='25'>"; break;
-						case '4':TXT +=  "<font size='50'>"; break;
-						case '5':TXT +=  "<font size='100'>"; break;
-						case '6':TXT +=  "<font size='150'>";break;
-					}				
+					TXT +=  "<font size='" + arr[1] + arr[2] + arr[3] + "'>";
+					arr.splice(0, 3);
 				}
 				else switch (arr[0])
 				{												

@@ -1,5 +1,6 @@
     package com.towerdefect
     {
+		import flash.events.Event;
         import flash.media.Sound;
         import flash.media.SoundChannel;
         import flash.media.SoundLoaderContext;
@@ -203,7 +204,7 @@
                
                 snd.paused = false;
             }
-           
+			
             /**
              * Stops the specified sound.
              *

@@ -3,9 +3,13 @@
 	public class Content
 	{
 		public static var sounds:Array=[
-			new SoundC("mainTheme", "../sound/menuClick.mp3"),
+			new SoundC("mainTheme", "../sound/soundResistance.mp3"),
 			new SoundC("menuOver", "../sound/menuOver.mp3"),
-			new SoundC("menuClick", "../sound/menuClick.mp3")
+			new SoundC("menuClick", "../sound/menuClick.mp3"),
+			new SoundC("tileOver", "../sound/tileOver.mp3"),
+			new SoundC("aTower", "../sound/aTower.mp3"),
+			new SoundC("bTower", "../sound/bTower.mp3"),
+			new SoundC("tick", "../sound/tick.mp3")
 		];
 		
 		public static var images:Array = [
