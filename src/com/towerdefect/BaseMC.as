@@ -169,7 +169,7 @@ package com.towerdefect
 			TweenLite.to(this, time, { alpha: opaque} );
 		}
 		
-		public function hide(time:Number = 0.3, shiftX:int = 0, shiftY:int = 0, scaleX:Number=1, scaleY:Number=1, destroy:Boolean=false):void
+		public function hide(destroy:Boolean=false, time:Number = 0.3, shiftX:int = 0, shiftY:int = 0, scaleX:Number=1, scaleY:Number=1):void
 		{			
 			if (destroy)
 				TweenLite.to(this, time, {alpha: 0, x:x+shiftX, y:y+shiftY, scaleX:scaleX, scaleY:scaleY, onComplete:rem } );
@@ -184,6 +184,11 @@ package com.towerdefect
 		
 		public function move(toX:int, toY:int, time:Number=0.3):void
 		{
+			if (time == 0)
+			{
+				x = toX;
+				y = toY;
+			}
 			TweenLite.to(this, time, { x: toX, y: toY, ease:Quad.easeOut} );
 		}
 

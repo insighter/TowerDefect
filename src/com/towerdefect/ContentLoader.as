@@ -104,7 +104,7 @@
 				if(c.image==null)
 					return;
 			timer.stop();
-			this.hide(0.3, 0, 0, 0, 0, true);
+			this.hide(true, 0.3, 0, 0, 0, 0);
 			dispatchEvent(new CustomEvent(CustomEvent.CONTENT_LOADED, this.name, true));
 		}			
 	}	

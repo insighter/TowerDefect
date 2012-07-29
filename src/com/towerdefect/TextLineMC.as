@@ -25,7 +25,6 @@ package com.towerdefect
 		private var init:Init;
 		private var holder:BaseMC;
 		private var segoeFont:Font;
-				
 		/**
              * 
              * @param	args [optional]	An initialisation object for specifying default instance properties.

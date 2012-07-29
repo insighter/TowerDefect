@@ -80,12 +80,11 @@
 			
 			//Clearing previous menu items and creating new
 			for each(var item:TextLineMC in menuItems)
-				item.hide(0.3, -50);
+				item.hide(false, 0.3, -50);
 			menuItems = new Array();
 			var coor:int = 0;
 			for (var i:int = 0; i < xml.item.length(); i++)
 			{
-				trace(i);
 				var xx:int = 0;
 				var yy:int = 0;
 				if (menuParams.direction=="vertical")

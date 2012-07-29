@@ -15,6 +15,7 @@
 		public static var images:Array = [
 			new Image("fone.game", 		"../images/main/game.jpg"),	
 			new Image("fone.field", 	"../images/main/field.png"),
+			new Image("fone.buildMenu", "../images/main/menu.png"),
 			
 			new Image("fone.panelG", 	"../images/main/panelG.png"),
 			new Image("fone.panelS", 	"../images/main/panelS.png"),
@@ -22,8 +23,11 @@
 			
 			new Image("tile.1", 		"../images/tile/tile_s1.jpg"),
 			
-			new Image("tower.volcanoK", "../images/tower/volcano.png"),
-			new Image("tower.cannonS", 	"../images/tower/cannon.png"),
+			new Image("tower.volcano",  "../images/tower/volcano.png"),
+			new Image("tower.cannon", 	"../images/tower/cannon.png"),
+			
+			new Image("creature.star1", "../images/creatures/creature1.jpg"),
+			new Image("creature.star2", "../images/creatures/creature2.png"),
 			
 			new Image("circle.w", 		"../images/balls/circleW.png"),
 			new Image("circle.b", 		"../images/balls/circleB.png"),

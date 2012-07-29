@@ -25,6 +25,7 @@ package com.towerdefect
 		private var menuScreen:BaseMC;
 		private var menu:Menu;
 		private var gameScreen:BaseMC;
+		private var buildMenu:BaseMC;
 		private var field:BaseMC;
 		private var panelG:BaseMC;//Game panel
 		private var panelS:BaseMC;//Stat panel
@@ -38,9 +39,10 @@ package com.towerdefect
 		private const xmlUrl:String = "config/Main.xml";
 		private var xml:XML;
 		private var phase:GamePhase;
-		private var rhytmTimer:Timer;
+		private var shotTimer:Timer;
 		private var minStepCount:int = 8;
 		private var towers:Array;
+		private var creatures:Array;
 		private var grid:BaseMC;
 		private var tiles:Array;
 		private var _startNode:INode;
@@ -122,7 +124,7 @@ package com.towerdefect
 				main:this,
 				opaque:0.85,
 				showDelay:400,
-				maxWidth:200,
+				maxWidth:250,
 				textColor:0x555555,
 				bgColor:0x000000,
 				fontName:new mySegoePrint().fontName,
@@ -234,7 +236,7 @@ package com.towerdefect
 		
 		private function startGame():void
 		{
-			menuScreen.hide(0.3, -50);
+			menuScreen.hide(false, 0.3, -50);
 			gameScreen.scale(1, 1);
 			gameScreen.move(0, 0);
 			field.forceAnimation = false;
@@ -248,10 +250,12 @@ package com.towerdefect
 			panelG.show();
 			panelS.show();
 			panelO.show();
-			rhytmTimer = new Timer(25, 320);
-			rhytmTimer.addEventListener(TimerEvent.TIMER, nextSoundStep, false, 0, true);
-			rhytmTimer.start();
+			shotTimer = new Timer(25, 320);
+			shotTimer.addEventListener(TimerEvent.TIMER, nextSoundStep, false, 0, true);
+			shotTimer.start();
 			soundManager.fadeSound("mainTheme", 0, 3);
+			creaturesGo();
+			buildGrid();
 		}
 		
 		private function createTiles():void
@@ -275,21 +279,10 @@ package com.towerdefect
 		
 		private function buildGrid():void
 		{
-			/*grid = new BaseMC( {
-				rect:new Rectangle((this.width-GRID_WIDTH)/2, (this.height-GRID_HEIGHT)/2, GRID_WIDTH, GRID_HEIGHT)
+			grid = new BaseMC( {
+				rect:new Rectangle(0, 0, field.width, field.height)
 			});
-			addChild(grid);
-			grid.graphics.lineStyle(1, 0xFF0000);
-			for (var i:int = 0; i <= tileCountY; i++)
-			{
-				grid.graphics.moveTo(0, stepY * i-0.5);
-				grid.graphics.lineTo(stepX*tileCountX, stepY * i-0.5);
-			}
-			for (i = 0; i <= tileCountX; i++)
-			{
-				grid.graphics.moveTo(stepX * i-0.5, 0);
-				grid.graphics.lineTo(stepX * i-0.5, stepY*tileCountY);
-			}*/
+			field.addChild(grid);
 		}
 		
 		public function enableTiles():void
@@ -349,72 +342,128 @@ package com.towerdefect
 		{
 			if (!phase.constructionMode) return;
 			lastNode = e.currentTarget as TileMC;
+			showBuildMenu();
+		}
+		
+		private function showBuildMenu():void
+		{
+			buildMenu = new BaseMC( {
+				rect:new Rectangle(lastNode.x, lastNode.y, 100, 100),
+				image:Utils.getBMPByName(images, "buildMenu"),
+				bevelFilter:new BevelFilter(2, 45, 0xFFFFFF, 1, 0xFFFFFF, 1, 0, 0, 1, 3)
+			});
+			field.addChild(buildMenu);
+			buildMenu.addEventListener(MouseEvent.ROLL_OUT, hideBuildMenu, false, 0, true);
+			buildMenu.addEventListener(MouseEvent.MOUSE_DOWN, hideBuildMenu, false, 0, true);
 			towers = new Array();
 			var tVolcano:TVolcano = new TVolcano( {
-				towerClass:Tower.volcanoK,
-				rect:new Rectangle(lastNode.x, lastNode.y-tileH, 24, 24),
+				towerParams:TowerParams.volcano,
+				rect:new Rectangle(-tileW, -tileH, 24, 24),
 				soundManager:soundManager,
-				rhytmTimer:rhytmTimer,
-				images:images
+				shotTimer:shotTimer,
+				images:images,
+				targets:creatures
 			});
-			field.addChild(tVolcano);
+			buildMenu.addChild(tVolcano);
 			var tCannon:TCannon = new TCannon( {
-				towerClass:Tower.cannonS,
-				rect:new Rectangle(lastNode.x+tileW, lastNode.y-tileH, 24, 24),
+				towerParams:TowerParams.cannon,
+				rect:new Rectangle(0, -tileH, 24, 24),
 				soundManager:soundManager,
-				rhytmTimer:rhytmTimer,
-				images:images
+				shotTimer:shotTimer,
+				images:images,
+				targets:creatures
 			});
-			field.addChild(tCannon);
+			buildMenu.addChild(tCannon);
 			var tbVolcano:TVolcano = new TVolcano( {
-				towerClass:Tower.volcanoK,
+				towerParams:TowerParams.volcano,
 				rect:new Rectangle(12, 12, 24, 24),
 				soundManager:soundManager,
-				rhytmTimer:rhytmTimer,
+				shotTimer:shotTimer,
 				images:images,
-				muted:true
+				containProjectiles:true,
+				muted:true,
+				targetsAim:false
 			});
 			var tbCannon:TCannon = new TCannon( {
-				towerClass:Tower.cannonS,
+				towerParams:TowerParams.cannon,
 				rect:new Rectangle(12, 12, 24, 24),
 				soundManager:soundManager,
-				rhytmTimer:rhytmTimer,
+				shotTimer:shotTimer,
 				images:images,
-				muted:true
+				containProjectiles:true,
+				muted:true,
+				targetsAim:false
 			});
-			tbVolcano.build(true, 0);
-			tbCannon.build(true, 0);
-			toolTip.addToolTip( { object:tVolcano,	title:"<r"+Tower.volcanoK.title+">", text:tbVolcano.paramInfo(), icon:tbVolcano });
-			toolTip.addToolTip( { object:tCannon,	title:"<r"+Tower.cannonS.title+">", text:tbCannon.paramInfo(), icon:tbCannon });
-			towers.push(tVolcano);
-			towers.push(tCannon);
+			tbVolcano.build(0);
+			tbCannon.build(0);
+			toolTip.addToolTip( { object:tVolcano,	title:"<r"+TowerParams.volcano.title+">", text:TowerParams.getInfo(TowerParams.volcano), icon:tbVolcano });
+			toolTip.addToolTip( { object:tCannon,	title:"<r"+TowerParams.cannon.title+">", text:TowerParams.getInfo(TowerParams.cannon), icon:tbCannon });
+			towers.push(tbVolcano);
+			towers.push(tbCannon);
 			tVolcano.addEventListener(MouseEvent.MOUSE_DOWN, buildTower, false, 0, true);
 			tCannon.addEventListener(MouseEvent.MOUSE_DOWN, buildTower, false, 0, true);
 		}
 		
+		private function hideBuildMenu(e:MouseEvent):void
+		{
+			buildMenu.removeEventListener(MouseEvent.ROLL_OUT, hideBuildMenu);
+			buildMenu.removeEventListener(MouseEvent.MOUSE_DOWN, hideBuildMenu);
+			for each(var t:Tower in towers)
+			{
+				t.hide(true);
+				toolTip.removeToolTip(t);
+			}
+			towers = null;
+			buildMenu.hide(true);
+			buildMenu = null;
+		}
+		
 		private function buildTower(e:MouseEvent):void
 		{
+			buildMenu.removeEventListener(MouseEvent.ROLL_OUT, hideBuildMenu);
+			buildMenu.removeEventListener(MouseEvent.MOUSE_DOWN, hideBuildMenu);
 			var tower:Tower = e.currentTarget as Tower;
 			for each(var t:Tower in towers)
 			{
+				if(t!=tower)
+					t.hide(true);
 				toolTip.removeToolTip(t);
-				t.active = false;
-				if (t != tower)
-					field.removeChild(t);
 			}
-			var curStep:int = Math.round(rhytmTimer.currentCount * 25 / 125 / minStepCount);
-			tower.move(lastNode.x, lastNode.y);
-			tower.build(true, curStep);
+			towers = null;
+			buildMenu.hide(true);
+			buildMenu = null;
+
+			var curStep:int = Math.round(shotTimer.currentCount * 25 / 125 / minStepCount);
+			field.addChild(tower);
+			tower.move(lastNode.x, lastNode.y, 0);
+			tower.scale(0, 0, 0);
+			tower.build(curStep);
 		}
 		
 		private function nextSoundStep(e:TimerEvent):void
 		{			
-			if (rhytmTimer.currentCount * 25 % 1000 == 0)
+			if (shotTimer.currentCount * 25 % 1000 == 0)
 				soundManager.playSound("tick");
-			if (rhytmTimer.currentCount == 40*8)
+			if (shotTimer.currentCount == 40*8)
 			{	
-				rhytmTimer.reset();
-				rhytmTimer.start();
+				shotTimer.reset();
+				shotTimer.start();
+			}
+		}
+		
+		private function creaturesGo():void
+		{
+			var c:Creature;
+			creatures = new Array();
+			for (var i:int = 0; i < 10; i++)
+			{
+				c = new Creature( { 
+					image:Utils.getBMPByName(images, "creature.star2"),
+					rect:new Rectangle(0, 0, 20, 20)
+				});
+				creatures.push(c);
+				field.addChild(c);
+				c.move(Utils.Rand(field.width) - field.width / 2, Utils.Rand(field.height) - field.height / 2, 50);
 			}
 		}
 	}
