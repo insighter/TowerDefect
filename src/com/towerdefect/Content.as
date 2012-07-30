@@ -9,13 +9,14 @@
 			new SoundC("tileOver", 		"../sound/tileOver.mp3"),
 			new SoundC("volcano", 		"../sound/volcano.mp3"),
 			new SoundC("cannon", 		"../sound/cannon.mp3"),
-			new SoundC("tick", 			"../sound/tick.mp3")
+			new SoundC("tick", 			"../sound/tick.mp3"),
+			new SoundC("ballHit", 		"../sound/ballHit.mp3", 0.3)
 		];
 		
 		public static var images:Array = [
 			new Image("fone.game", 		"../images/main/game.jpg"),	
 			new Image("fone.field", 	"../images/main/field.png"),
-			new Image("fone.buildMenu", "../images/main/menu.png"),
+			new Image("fone.buildMenu", "../images/main/game.jpg"),
 			
 			new Image("fone.panelG", 	"../images/main/panelG.png"),
 			new Image("fone.panelS", 	"../images/main/panelS.png"),

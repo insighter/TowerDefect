@@ -113,7 +113,7 @@
              *
              * @return Boolean A boolean value representing if the sound was added successfully
              */
-            public function addExternalSound($path:String, $name:String, $buffer:Number = 1000, $checkPolicyFile:Boolean = false):Boolean
+            public function addExternalSound($path:String, $name:String, volume:Number, $buffer:Number = 1000, $checkPolicyFile:Boolean = false):Boolean
             {
                 for (var i:int = 0; i <this._sounds.length; i++)
                 {
@@ -128,7 +128,7 @@
                 sndObj.channel = new SoundChannel();
                 sndObj.position = 0;
                 sndObj.paused = true;
-                sndObj.volume = 1;
+                sndObj.volume = volume;
                 sndObj.startTime = 0;
                 sndObj.loops = 0;
                 sndObj.pausedByAll = false;

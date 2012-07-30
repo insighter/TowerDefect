@@ -21,7 +21,7 @@ package com.towerdefect
 		public static const CARD_MOUSE_OVER:String = "mouse_over_card";
 		public static const CARD_CHOOSED:String = "card_choosed";
 		public static const SFS_LOGIN:String = "SFS_LOGIN";
-		public static const GAME_START:String = "GAME_START";		
+		public static const GAME_START:String = "GAME_START";
 		
 		public static const BASEMC_MOUSE_DOWN:String = "BASEMC_MOUSE_DOWN";
 		public static const BASEMC_MOUSE_OUT:String = "BASEMC_MOUSE_OUT";

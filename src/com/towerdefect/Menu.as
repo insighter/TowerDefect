@@ -24,6 +24,7 @@
 		private var shf:DropShadowFilter;
 		private var menuParams:MenuParams;
 		private var items:Array;	
+		private var curLevel:int;
 		private var init:Init;
 		/**
              * 
@@ -51,13 +52,14 @@
 			xmlLoader.load();
 		}
 		
-       	private function XMLLoaded(e:CustomEvent):void
+       	private function XMLLoaded(e:CustomEvent=null):void
         {
-			if (e.args != xmlUrl) return;//Отсеиваем события от ненужных xmlLoader-ов (если одновременно загружались несколько)
+			//if (e.args != xmlUrl) return;//Отсеиваем события от ненужных xmlLoader-ов (если одновременно загружались несколько)
 			xmlLoader.removeEventListener(CustomEvent.XML_LOADED, XMLLoaded);  
-			var xml:XML = xmlLoader.xml;
+			xml = xmlLoader.xml;
 			this.x = xml.vars.@x;
 			this.y = xml.vars.@y;
+			curLevel = 1;
 			
 			//storing menu parameters
 			menuParams = new MenuParams({
@@ -77,14 +79,22 @@
 				"glowStrength":		parseInt(xml.vars.glow.@strength),
 				"animationTime":	xml.vars.@animationTime
 			});
-			
+			loadItems();
+		}
+		
+		private function loadItems():void
+		{
 			//Clearing previous menu items and creating new
 			for each(var item:TextLineMC in menuItems)
-				item.hide(false, 0.3, -50);
+			{
+				item.removeListeners();
+				item.hide(true, 0.5, Utils.Rand(100) - 50, Utils.Rand(100) - 50, Utils.RandF(4), Utils.RandF(4));
+			}
 			menuItems = new Array();
 			var coor:int = 0;
 			for (var i:int = 0; i < xml.item.length(); i++)
 			{
+				if (xml.item[i].level != curLevel) continue;
 				var xx:int = 0;
 				var yy:int = 0;
 				if (menuParams.direction=="vertical")
@@ -136,7 +146,14 @@
 				menuParams.currentItem = item;
 				chooseItemAnimation();
 				soundManager.playSound("menuClick");
-				dispatchEvent(new CustomEvent(CustomEvent.MENU, item.method, true));
+				if (item.method != "in" && item.method != "out")
+					dispatchEvent(new CustomEvent(CustomEvent.MENU, item.method, true));
+				else
+				{
+					if (item.method == "in") curLevel++;
+					else if (item.method == "out") curLevel--;
+					loadItems();
+				}
 			}
 		}
 		

@@ -12,10 +12,11 @@ package com.towerdefect
 	import flash.filters.DropShadowFilter;
 	import flash.filters.GlowFilter;
 	import flash.geom.Rectangle;
+	import flash.globalization.LocaleID;
 	import flash.system.fscommand;
 	import flash.text.TextFieldAutoSize;
+	import flash.utils.getDefinitionByName;
 	import flash.utils.Timer;
-
 	/**
 	 * ...
 	 * @author insighter
@@ -26,6 +27,7 @@ package com.towerdefect
 		private var menu:Menu;
 		private var gameScreen:BaseMC;
 		private var buildMenu:BaseMC;
+		private var buildMenuTowers:Array;
 		private var field:BaseMC;
 		private var panelG:BaseMC;//Game panel
 		private var panelS:BaseMC;//Stat panel
@@ -39,7 +41,9 @@ package com.towerdefect
 		private const xmlUrl:String = "config/Main.xml";
 		private var xml:XML;
 		private var phase:GamePhase;
-		private var shotTimer:Timer;
+		private var beatTimer:Timer;
+		private var roadTimer:Timer;
+		private var creaturesTimer:Timer;
 		private var minStepCount:int = 8;
 		private var towers:Array;
 		private var creatures:Array;
@@ -55,13 +59,16 @@ package com.towerdefect
 		private const maxGridCountY:int = 50;
 		private const minGridCountX:int = 1;
 		private const minGridCountY:int = 1;
-		private var lastNode:INode;
-		private var lastTower:ITower;
+		private var lastNode:TileMC;
 		private var tileW:int;
 		private var tileH:int;
 		private var tileCountX:int;
 		private var tileCountY:int;
+		private var area:int;
 		private var gridSpacing:int;
+		private var roadTiles:Array;
+		private var curTile:TileMC;
+		private var road:Array;
 		
 		public function Main():void 
 		{
@@ -93,6 +100,7 @@ package com.towerdefect
 			this.gridSpacing = parseInt(xml.vars.@gridSpacing);
 			this.tileCountX = parseInt(xml.vars.@tileCountX);
 			this.tileCountY = parseInt(xml.vars.@tileCountY);
+			this.area = tileCountX * tileCountY;
 			init();
 		}
 		
@@ -104,7 +112,7 @@ package com.towerdefect
 			soundManager = SoundManager.getInstance();
 			phase = new GamePhase();
 			for each(var s:SoundC in Content.sounds)
-				soundManager.addExternalSound(s.path, s.name);
+				soundManager.addExternalSound(s.path, s.name, s.defaultVolume);
 			soundManager.playSound("mainTheme", 0.8);
 
 			images = Content.images;
@@ -124,7 +132,7 @@ package com.towerdefect
 				main:this,
 				opaque:0.85,
 				showDelay:400,
-				maxWidth:250,
+				maxWidth:300,
 				textColor:0x555555,
 				bgColor:0x000000,
 				fontName:new mySegoePrint().fontName,
@@ -245,17 +253,17 @@ package com.towerdefect
 			field.bevelFilter = new BevelFilter(1, 45, 0x222222, 1, 0x222222);
 			hideTiles();
 			mouseTiles(true);
-			phase.constructionMode = true;
 			phase.mainPhase = "game";
 			panelG.show();
 			panelS.show();
 			panelO.show();
-			shotTimer = new Timer(25, 320);
-			shotTimer.addEventListener(TimerEvent.TIMER, nextSoundStep, false, 0, true);
-			shotTimer.start();
+			beatTimer = new Timer(25, 320);
+			beatTimer.addEventListener(TimerEvent.TIMER, nextSoundStep, false, 0, true);
+			beatTimer.start();
 			soundManager.fadeSound("mainTheme", 0, 3);
-			creaturesGo();
 			buildGrid();
+			createRoad();
+			createBuildMenu();
 		}
 		
 		private function createTiles():void
@@ -268,8 +276,8 @@ package com.towerdefect
 						name:"tile." + String(i * tileCountY + j + 1),
 						image:Utils.getBMPByName(images, "tile.1"),
 						opaque:0.4,
-						row:i+1,
-						col:j+1,
+						row:j+1,
+						col:i+1,
 						rect:new Rectangle( -field.width / 2 + j * (tileW + gridSpacing) + tileW / 2, -field.height / 2 + i * (tileH + gridSpacing) + tileH / 2, tileW, tileH)
 					});
 					tiles.push(t);
@@ -314,27 +322,30 @@ package com.towerdefect
 		public function showTiles():void
 		{
 			for each(var t:TileMC in tiles)
-				t.setOpaque(0.4);
+				t.opaque = 0.4;
 		}
 		
 		public function hideTiles():void
 		{
 			for each(var t:TileMC in tiles)
-				t.setOpaque(0);
+				t.opaque = 0;
 		}
 		
 		private function onTileOver(e:MouseEvent):void 
 		{
 			var node:TileMC = e.currentTarget as TileMC;
-			node.setOpaque(0.5);
-			if (phase.mainPhase == "menu")
+			if (phase.mainPhase == "menu" && node.opaque != 0)
+			{
 				soundManager.playSound("tileOver");
+				node.opaque = 0.5;
+			}
 		}
 		
 		private function onTileOut(e:MouseEvent):void 
 		{
 			var node:TileMC = e.currentTarget as TileMC;
-			node.setOpaque(0);
+			if (phase.mainPhase == "menu")
+				node.opaque = 0;
 			if (node != _startNode && node != _endNode) node.removeFilters();
 		}
 		
@@ -342,25 +353,28 @@ package com.towerdefect
 		{
 			if (!phase.constructionMode) return;
 			lastNode = e.currentTarget as TileMC;
+			if (lastNode.tower != null) return;
 			showBuildMenu();
 		}
 		
-		private function showBuildMenu():void
+		private function createBuildMenu():void
 		{
 			buildMenu = new BaseMC( {
-				rect:new Rectangle(lastNode.x, lastNode.y, 100, 100),
+				rect:new Rectangle(0, 0, 100, 100),
+				opaque:0.8,
 				image:Utils.getBMPByName(images, "buildMenu"),
-				bevelFilter:new BevelFilter(2, 45, 0xFFFFFF, 1, 0xFFFFFF, 1, 0, 0, 1, 3)
+				bevelFilter:new BevelFilter(2, 45, 0x555555, 1, 0x555555, 1, 0, 0, 1, 3),
+				dropShadowFilter:new DropShadowFilter(4, 45, 0x000000, 1, 6, 6, 2, 3),
+				showOnCreate:false
 			});
 			field.addChild(buildMenu);
-			buildMenu.addEventListener(MouseEvent.ROLL_OUT, hideBuildMenu, false, 0, true);
-			buildMenu.addEventListener(MouseEvent.MOUSE_DOWN, hideBuildMenu, false, 0, true);
+			
 			towers = new Array();
 			var tVolcano:TVolcano = new TVolcano( {
 				towerParams:TowerParams.volcano,
 				rect:new Rectangle(-tileW, -tileH, 24, 24),
 				soundManager:soundManager,
-				shotTimer:shotTimer,
+				beatTimer:beatTimer,
 				images:images,
 				targets:creatures
 			});
@@ -369,7 +383,7 @@ package com.towerdefect
 				towerParams:TowerParams.cannon,
 				rect:new Rectangle(0, -tileH, 24, 24),
 				soundManager:soundManager,
-				shotTimer:shotTimer,
+				beatTimer:beatTimer,
 				images:images,
 				targets:creatures
 			});
@@ -378,7 +392,7 @@ package com.towerdefect
 				towerParams:TowerParams.volcano,
 				rect:new Rectangle(12, 12, 24, 24),
 				soundManager:soundManager,
-				shotTimer:shotTimer,
+				beatTimer:beatTimer,
 				images:images,
 				containProjectiles:true,
 				muted:true,
@@ -388,83 +402,136 @@ package com.towerdefect
 				towerParams:TowerParams.cannon,
 				rect:new Rectangle(12, 12, 24, 24),
 				soundManager:soundManager,
-				shotTimer:shotTimer,
+				beatTimer:beatTimer,
 				images:images,
 				containProjectiles:true,
 				muted:true,
-				targetsAim:false
+				targetsAim:false,
+				bevelFilter:new BevelFilter(1, 45, 0xffffff, 1, 0x000000, 0, 0, 0, 1, 3)
 			});
 			tbVolcano.build(0);
 			tbCannon.build(0);
 			toolTip.addToolTip( { object:tVolcano,	title:"<r"+TowerParams.volcano.title+">", text:TowerParams.getInfo(TowerParams.volcano), icon:tbVolcano });
 			toolTip.addToolTip( { object:tCannon,	title:"<r"+TowerParams.cannon.title+">", text:TowerParams.getInfo(TowerParams.cannon), icon:tbCannon });
-			towers.push(tbVolcano);
-			towers.push(tbCannon);
 			tVolcano.addEventListener(MouseEvent.MOUSE_DOWN, buildTower, false, 0, true);
 			tCannon.addEventListener(MouseEvent.MOUSE_DOWN, buildTower, false, 0, true);
 		}
 		
-		private function hideBuildMenu(e:MouseEvent):void
+		private function showBuildMenu():void
+		{
+			buildMenu.addEventListener(MouseEvent.ROLL_OUT, hideBuildMenu, false, 0, true);
+			buildMenu.addEventListener(MouseEvent.MOUSE_DOWN, hideBuildMenu, false, 0, true);
+			buildMenu.move(lastNode.x, lastNode.y, 0);
+			buildMenu.show();
+		}
+		
+		private function hideBuildMenu(e:MouseEvent=null):void
 		{
 			buildMenu.removeEventListener(MouseEvent.ROLL_OUT, hideBuildMenu);
 			buildMenu.removeEventListener(MouseEvent.MOUSE_DOWN, hideBuildMenu);
-			for each(var t:Tower in towers)
-			{
-				t.hide(true);
-				toolTip.removeToolTip(t);
-			}
-			towers = null;
-			buildMenu.hide(true);
-			buildMenu = null;
+			buildMenu.hide();
 		}
 		
 		private function buildTower(e:MouseEvent):void
 		{
-			buildMenu.removeEventListener(MouseEvent.ROLL_OUT, hideBuildMenu);
-			buildMenu.removeEventListener(MouseEvent.MOUSE_DOWN, hideBuildMenu);
+			hideBuildMenu();
 			var tower:Tower = e.currentTarget as Tower;
-			for each(var t:Tower in towers)
-			{
-				if(t!=tower)
-					t.hide(true);
-				toolTip.removeToolTip(t);
-			}
-			towers = null;
-			buildMenu.hide(true);
-			buildMenu = null;
-
-			var curStep:int = Math.round(shotTimer.currentCount * 25 / 125 / minStepCount);
-			field.addChild(tower);
-			tower.move(lastNode.x, lastNode.y, 0);
-			tower.scale(0, 0, 0);
-			tower.build(curStep);
+			
+			var myClass:Class = tower.params.className;
+			var newTower:* = new myClass( {
+				towerParams:tower.params,
+				rect:new Rectangle(lastNode.x+1, lastNode.y+1, 24, 24),
+				soundManager:soundManager,
+				beatTimer:beatTimer,
+				images:images,
+				targets:creatures
+			});
+			var curStep:int = Math.round(beatTimer.currentCount * 25 / 125 / minStepCount);
+			field.addChild(newTower);
+			lastNode.tower = newTower;
+			newTower.build(curStep);
 		}
 		
 		private function nextSoundStep(e:TimerEvent):void
 		{			
-			if (shotTimer.currentCount * 25 % 1000 == 0)
+			if (beatTimer.currentCount * 25 % 1000 == 0)
 				soundManager.playSound("tick");
-			if (shotTimer.currentCount == 40*8)
+			if (beatTimer.currentCount == 40*8)
 			{	
-				shotTimer.reset();
-				shotTimer.start();
+				beatTimer.reset();
+				beatTimer.start();
 			}
+		}
+		
+		private function createRoad():void
+		{
+			var i:int;
+			roadTiles = tiles.concat();
+			road = new Array();
+			for (i = 1; i < tileCountX - 1; i++)
+			{
+				roadTiles.splice(i, 1);
+				roadTiles.splice(area - i - 1, 1);
+			}
+			for (i = 1; i < tileCountY - 1; i++)
+			{
+				roadTiles.splice(i * tileCountX, 1);
+				roadTiles.splice(tileCountX * (i + 1) - 1, 1);
+			}
+			curTile = tiles[Utils.Rand(tileCountX - 2) + 1];
+			do
+			{
+				road.push(curTile);	
+				var connected:Array = Pathfinder.findConnectedNodes(curTile, roadTiles, false);
+				curTile = Utils.randElement(connected);
+				for each(var t:TileMC in connected)
+					if(roadTiles.indexOf(t)!=-1)
+						roadTiles.splice(roadTiles.indexOf(t), 1);
+			}while(connected.length>0 && road.length<area / 10)
+			if (road.length < area / 10) 
+				createRoad();
+			else 
+			{
+				roadTimer = new Timer(50, road.length);
+				roadTimer.addEventListener(TimerEvent.TIMER, addRoadTile, false, 0, true);
+				roadTimer.addEventListener(TimerEvent.TIMER_COMPLETE, roadAdded, false, 0, true);
+				roadTimer.start();
+			}
+		}
+				
+		private function addRoadTile(e:TimerEvent):void
+		{
+			var t:TileMC = road[roadTimer.currentCount - 1] as TileMC;
+			t.scale(1, 0, 0);
+			t.scale(1, 1, 0.3);
+			t.opaque = 0.8;
+		}
+		
+		private function roadAdded(e:TimerEvent):void
+		{
+			creaturesGo();
+			phase.constructionMode = true;
 		}
 		
 		private function creaturesGo():void
 		{
-			var c:Creature;
 			creatures = new Array();
-			for (var i:int = 0; i < 10; i++)
-			{
-				c = new Creature( { 
-					image:Utils.getBMPByName(images, "creature.star2"),
-					rect:new Rectangle(0, 0, 20, 20)
-				});
+			creaturesTimer = new Timer(4000, 20);
+			creaturesTimer.addEventListener(TimerEvent.TIMER, createCreature, false, 0, true);
+			creaturesTimer.start();
+		}
+		
+		private function createCreature(e:TimerEvent):void
+		{
+			var c:Creature = new Creature( { 
+				image:Utils.getBMPByName(images, "creature.star2"),
+				rect:new Rectangle(road[0].x, road[0].y, 20, 20),
+				dropShadowFilter:new DropShadowFilter(2, 45, 0x000000, 1, 4, 4, 1, 3),
+				road:road
+			});
 				creatures.push(c);
 				field.addChild(c);
-				c.move(Utils.Rand(field.width) - field.width / 2, Utils.Rand(field.height) - field.height / 2, 50);
-			}
+				c.beginMove();
 		}
 	}
 }

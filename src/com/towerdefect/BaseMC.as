@@ -19,7 +19,7 @@ package com.towerdefect
          */
 	public class BaseMC extends MovieClip
 	{		
-		protected var opaque:Number;		
+		protected var _opaque:Number;		
 		protected var rect:Rectangle; 
 		protected var soundManager:SoundManager;
 		protected var _mouseDownMethod:String;
@@ -77,7 +77,7 @@ package com.towerdefect
 			this.init = new Init(args);
 			this.images = init.getArray("images");
 			this.name = init.getString("name", "baseMC");
-			this.opaque = init.getNumber("opaque", 1);
+			this._opaque = init.getNumber("opaque", 1);
 			this.rect = init.getRectangle("rect", new Rectangle(0, 0, 0, 0));
    			this.x = rect.x; this.x0 = x;
 			this.y = rect.y; this.y0 = y;
@@ -142,9 +142,14 @@ package com.towerdefect
 			return _mouseDownMethod;
 		}
 		
-		public function setOpaque(value:Number):void
+		public function get opaque():Number
 		{
-			opaque = value;
+			return this._opaque;
+		}
+		
+		public function set opaque(value:Number):void
+		{
+			_opaque = value;
 			show();
 		}
 		
@@ -182,14 +187,24 @@ package com.towerdefect
 			visible = false;
 		}
 		
-		public function move(toX:int, toY:int, time:Number=0.3):void
+		public function move(toX:int, toY:int, time:Number = 0.3, ease:Boolean = true ):void
 		{
 			if (time == 0)
 			{
 				x = toX;
 				y = toY;
 			}
-			TweenLite.to(this, time, { x: toX, y: toY, ease:Quad.easeOut} );
+			if (ease)
+				TweenLite.to(this, time, { x: toX, y: toY, ease:Quad.easeOut } );
+			else
+				TweenLite.to(this, time, { x: toX, y: toY, ease:Linear.easeNone} );
+		}
+		
+		public function rotate(value:int, time:Number=0.3):void
+		{
+			if (time == 0)
+				rotation = value;
+			TweenLite.to(this, time, { rotation: value, ease:Linear.easeNone} );
 		}
 
 		private function rem():void
@@ -200,6 +215,13 @@ package com.towerdefect
 		public function removeFilters():void
 		{
 			this.filters = [];
+		}
+		
+		public function removeListeners():void
+		{
+			removeEventListener(MouseEvent.ROLL_OVER, mouseOver);
+			removeEventListener(MouseEvent.ROLL_OUT, mouseOut);
+			removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 		}
 		
 		private function mouseOver(e:MouseEvent):void
