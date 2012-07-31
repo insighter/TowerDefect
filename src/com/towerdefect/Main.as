@@ -1,8 +1,10 @@
 package com.towerdefect
 {
+	import com.greensock.easing.Linear;
 	import com.greensock.motionPaths.RectanglePath2D;
 	import com.greensock.plugins.GlowFilterPlugin;
 	import com.greensock.TweenLite;
+	import com.greensock.TweenMax;
 	import flash.display.Sprite;
 	import flash.display.StageQuality;
 	import flash.events.Event;
@@ -80,6 +82,7 @@ package com.towerdefect
 		private var road:Array;
 		private var roadLength:int;
 		private var score:int;
+		private var timeScale:BaseMC;
 		
 		public function Main():void 
 		{
@@ -143,6 +146,8 @@ package com.towerdefect
 		
 		private function contentLoaded(e:CustomEvent):void
 		{
+			beatTimer = new Timer(25, 320);
+			beatTimer.addEventListener(TimerEvent.TIMER, nextBeat, false, 0, true);
 			//Creating main ToolTip object that will manage all tooltips
 			toolTip = new ToolTip( {
 				main:this,
@@ -205,6 +210,19 @@ package com.towerdefect
 				fontSize:20,
 				text:score
 			});
+			timeScale = new TimeScale( {
+				rect:new Rectangle( 0, 0, 0, 0),
+				images:images,
+				soundManager:soundManager,
+				beatTimer:beatTimer,
+				tileW:tileW,
+				orientation:"vertical",
+				canterImage:false,
+				parentW:panelG.width,
+				parentH:panelG.height,
+				arrowSize:10
+			});
+			panelG.addChild(timeScale);
 			panelS.addChild(scoreT);
 			panelS.addChild(scoreL);
 			panelO = new BaseMC( {
@@ -320,13 +338,10 @@ package com.towerdefect
 			mouseTiles(true);
 			phase.mainPhase = "game";
 			soundManager.fadeSound("mainTheme", 0, 3);
-			beatTimer = new Timer(25, 320);
-			beatTimer.addEventListener(TimerEvent.TIMER, nextBeat, false, 0, true);
 			beatTimer.start();
 			createRoad();
-			createBuildMenu();
+			createBuildMenu();			
 			addEventListener(CustomEvent.CREATURE_KILLED, creatureKilled, false, 0, true);
-			
 			score = 0;
 		}
 		

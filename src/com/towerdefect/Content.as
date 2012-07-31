@@ -19,6 +19,8 @@
 			new Image("fone.field", 	"../images/main/field.png"),
 			new Image("fone.buildMenu", "../images/main/game.jpg"),
 			
+			new Image("stuff.timeArrow", "../images/main/timeArrow.png"),
+			
 			new Image("fone.panelG", 	"../images/main/panelG.png"),
 			new Image("fone.panelS", 	"../images/main/panelS.png"),
 			new Image("fone.panelO", 	"../images/main/panelO.png"),
