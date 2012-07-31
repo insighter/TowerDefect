@@ -8,7 +8,7 @@ package com.towerdefect
 		public var textBottomOffset:int;
 		public var itemAlpha:Number;
 		public var curItemAlpha:Number;
-		public var currentItem:TextLineMC;
+		public var currentItem:TextMC;
 		public var fontSize:int;
 		public var fontColor:uint;
 		public var glowColor:uint;

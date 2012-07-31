@@ -1,61 +1,100 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <menu>
-	<vars
-		x="310" y="240" direction="vertical"
-		buttonSpacing="0" textTopOffset="10" textBottomOffset="5"
-		currentItem="-1" itemAlpha="0.5" curItemAlpha="1" animationTime="0.3"
-	>
-		<font size="25" color="#000000" />
-		<glow color="#000000" alpha="1" blurX="25" blurY="30" strength="5" />
-	</vars>
-	
-	<item>
-	<level>1</level>
-    <text>PLAY</text>
-    <method>in</method>
-    <args></args>
-  	</item>
-	
-  	<item>
-    <level>1</level>
-    <text>HIGH SCORES</text>
-    <method>hsco</method>
-    <args></args>
-  	</item>
-	
-  	<item>
-    <level>1</level>
-    <text>EXIT</text>
-    <method>quit</method>
-    <args></args>
-    </item>
-	
-	<item>
-	<level>2</level>
-	<text>DEMO LEVEL</text>
-    <method>game</method>
-    <args></args>
-  	</item>
-	
-  	<item>
-    <level>2</level>
-    <text>NORMAL MODE</text>
-    <method>out</method>
-    <args></args>
-  	</item>
-	
-  	<item>
-    <level>2</level>
-    <text>SURVIVAL</text>
-    <method>out</method>
-    <args></args>
-    </item>
-	
-	<item>
-    <level>2</level>
-    <text>BACK</text>
-    <method>out</method>
-    <args></args>
-    </item>
-	
+<vars
+	x="310" y="240" direction="vertical"
+	buttonSpacing="0" textTopOffset="10" textBottomOffset="5"
+	currentItem="-1" itemAlpha="0.5" curItemAlpha="1" animationTime="0.3"
+>
+	<font size="25" color="#000000" />
+	<glow color="#000000" alpha="1" blurX="25" blurY="30" strength="5" />
+</vars>
+
+<effect>
+<name>mouseDeltaX</name>
+<mouseDelta>350</mouseDelta>
+<menuDelta>20</menuDelta>
+</effect>
+
+<effect>
+<name>mouseDeltaY</name>
+<mouseDelta>300</mouseDelta>
+<menuDelta>100</menuDelta>
+</effect>
+
+<item>
+<level>1</level>
+<text>PLAY</text>
+<method>2</method>
+</item>
+
+<item>
+<level>1</level>
+<text>HIGH SCORES</text>
+<method>4hsco</method>
+</item>
+
+<item>
+<level>1</level>
+<text>ABOUT</text>
+<method>3about</method>
+</item>
+
+<item>
+<level>1</level>
+<text>EXIT</text>
+<shiftY>50</shiftY>
+<method>quit</method>
+</item>
+
+<item>
+<level>2</level>
+<text>DEMO LEVEL</text>
+<method>game</method>
+</item>
+
+<item>
+<level>2</level>
+<text>NORMAL MODE</text>
+<method>1norm</method>
+</item>
+
+<item>
+<level>2</level>
+<text>SURVIVAL</text>
+<method>1surv</method>
+</item>
+
+<item>
+<level>2</level>
+<text>BACK</text>
+<method>1</method>
+</item>
+
+<item>
+<level>3</level>
+<text>BACK</text>
+<method>1hideAbout</method>
+<shiftX>200</shiftX>
+<shiftY>300</shiftY>
+<useEffects>0</useEffects>
+</item>
+
+<item>
+<level>3</level>
+<text>REPLAY</text>
+<method>replayAbout</method>
+<shiftX>-200</shiftX>
+<shiftY>260</shiftY>
+<useEffects>0</useEffects>
+</item>
+
+<item>
+<level>4</level>
+<text>BACK</text>
+<method>1hideScores</method>
+<shiftX>200</shiftX>
+<shiftY>280</shiftY>
+<useEffects>0</useEffects>
+</item>
+
 </menu>

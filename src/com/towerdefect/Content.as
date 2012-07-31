@@ -10,7 +10,8 @@
 			new SoundC("volcano", 		"../sound/volcano.mp3"),
 			new SoundC("cannon", 		"../sound/cannon.mp3"),
 			new SoundC("tick", 			"../sound/tick.mp3"),
-			new SoundC("ballHit", 		"../sound/ballHit.mp3", 0.3)
+			new SoundC("ballHit", 		"../sound/ballHit.mp3", 0.1),
+			new SoundC("starKill", 		"../sound/cannon.mp3", 0.1)
 		];
 		
 		public static var images:Array = [
@@ -24,18 +25,12 @@
 			
 			new Image("tile.1", 		"../images/tile/tile_s1.jpg"),
 			
-			new Image("tower.volcano",  "../images/tower/volcano.png"),
-			new Image("tower.cannon", 	"../images/tower/cannon.png"),
+			new Image("tower.volcano",  "../images/towers/volcano.png"),
+			new Image("tower.cannon", 	"../images/towers/cannon.png"),
 			
-			new Image("creature.star1", "../images/creatures/creature1.jpg"),
-			new Image("creature.star2", "../images/creatures/creature2.png"),
+			new Image("projectile.ball","../images/projectiles/ball.png"),
 			
-			new Image("circle.w", 		"../images/balls/circleW.png"),
-			new Image("circle.b", 		"../images/balls/circleB.png"),
-			new Image("circle.g", 		"../images/balls/circleG.png"),
-			new Image("circle.d", 		"../images/balls/circleD.png"),
-			new Image("circle.r", 		"../images/balls/circleR.png"),
-			new Image("circle.y", 		"../images/balls/circleY.png"),
+			new Image("creature.star", "../images/creatures/star.png")
 		];
 	}
 }

@@ -186,13 +186,13 @@
              *
              * @return void
              */
-            public function playSound($name:String, $volume:Number = 1, $startTime:Number = 0, $loops:int = 0):void
+            public function playSound($name:String, volume:Number = 1, $startTime:Number = 0, $loops:int = 0):void
             {
                 var snd:Object = this._soundsDict[$name];
-                snd.volume = $volume;
+                if (volume != 1)
+					snd.volume = volume;
                 snd.startTime = $startTime;
                 snd.loops = $loops;
-                   
                 if (snd.paused)
                 {
                     snd.channel = snd.sound.play(snd.position, snd.loops, new SoundTransform(snd.volume));

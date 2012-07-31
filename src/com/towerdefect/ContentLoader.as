@@ -22,20 +22,19 @@
 		private var timer:Timer=new Timer(50, 10000);
 		private var bytesTotal:Array=new Array();
 		private var bytesLoaded:Array = new Array();	
-		private var loadedTMC:TextLineMC;
-		private var remainTMC:TextLineMC;
-		private var progressTMC:TextLineMC;
+		private var loadedTMC:TextMC;
+		private var remainTMC:TextMC;
+		private var progressTMC:TextMC;
 		private var progressBar:BaseMC;
 		private var emptyBar:BaseMC;
 		private var init:Init;
 		/**
              * 
              * @param	args [optional]	An initialisation object for specifying default instance properties.
-			 * -	images : Array = []		Array of 'Image' class instances, that passed to BaseMC constructor.
-			 * -				At this moment each instance of Image class in this array should have two variables:
-			 * -				name:String and path:String, where path is valid path to image file.
-			 * -				Once image file is loaded using path variable, image variable 
-			 * -				(the third variable of Image class instance) will be updated with loaded BitmapData.
+			 * -	images : Array = []	Array of 'Image' class instances.
+			 * -				At this moment each of those instances has two non-zero variables: 'name' and 'path'
+			 * -				and the variable image:BitmapData=null. Once image file is loaded using 'path' variable, 
+			 * -				image:BitmapData variable will be updated with loaded BitmapData.
 			 * -	textColor : uint = 0xFFFFFF	The color to be passed to the text fields
 			 * -	
              */
@@ -47,9 +46,9 @@
 			timer.addEventListener(TimerEvent.TIMER, tick);
 			timer.reset();
 			timer.start();						
-			loadedTMC = new TextLineMC( { rect:new Rectangle(-50, 0, 0, 0), fontColor:textColor} );
-			remainTMC = new TextLineMC( { rect:new Rectangle(-50, 30, 0, 0), fontColor:textColor} );
-			progressTMC = new TextLineMC( { rect:new Rectangle(-50, 60, 0, 0), fontColor:textColor} );
+			loadedTMC = new TextMC( { rect:new Rectangle(-50, 0, 0, 0), fontColor:textColor} );
+			remainTMC = new TextMC( { rect:new Rectangle(-50, 30, 0, 0), fontColor:textColor} );
+			progressTMC = new TextMC( { rect:new Rectangle(-50, 60, 0, 0), fontColor:textColor} );
 			addChild(loadedTMC);
 			addChild(remainTMC);
 			addChild(progressTMC);

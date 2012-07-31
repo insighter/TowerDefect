@@ -63,12 +63,12 @@ package com.towerdefect
 			 * -	forceAnimation:Boolean = false		Force animation process in spite of mouse position
 			 * -	animationScale : Number = 1		Scale of object for use in animation loop on MouseOver
 			 * -	animationTime : Number = 0.2
-			 * -	mouseSpecialEffect:Boolean = false		If set to TRUE, 'reactOnMouse' become TRUE
+			 * -	mouseSpecialEffect:Object		If set to TRUE, 'reactOnMouse' become TRUE
 			 * -	mouseDownMethod : String = name	Method to be called on mouseDown
 			 * 
-			 * -	image : BitmapData = null
+			 * -	image : BitmapData = null		Image that will be placed in MovieClip
 			 * -	imageOpaque : Number = 1
-			 * -	centerImage : Boolean = true		Whether or not center image
+			 * -	centerImage : Boolean = true		Whether or not center image. If true
 			 * -	fillColor : uint = 0x000000			Fill movie clip with solid color instead of using image
 			 * -	images : Array		Reference to the array of all preloaded images of main class
              */
@@ -92,6 +92,8 @@ package com.towerdefect
 			this.dispatchEvents = init.getBoolean("dispatchEvents", false);
 			this.mouseAnimation = init.getBoolean("mouseAnimation", false);
 			this.mouseSpecialEffect = init.getObject("mouseSpecialEffect");
+			if (mouseSpecialEffect != null)
+				addEventListener(Event.ENTER_FRAME, enterFrame, false, 0, true);
 			if (dispatchEvent || _mouseAnimation || mouseSpecialEffect!=null) reactOnMouse = true;
 			this.animationScale = init.getNumber("animationScale", 1);
 			this.animationTime = init.getNumber("animationTime", 0.2);
@@ -100,9 +102,7 @@ package com.towerdefect
 				addEventListener(MouseEvent.ROLL_OVER, mouseOver, false, 0, true);
 				addEventListener(MouseEvent.ROLL_OUT, mouseOut, false, 0, true);
 				addEventListener(MouseEvent.MOUSE_DOWN, mouseDown, false, 0, true);
-			}
-			if (mouseSpecialEffect != null)
-				addEventListener(Event.ENTER_FRAME, enterFrame, false, 0, true);
+			}			
 			var image:BitmapData = init.getBitmap("image");
 			var centerImage:Boolean = init.getBoolean("centerImage", true);
 			if(image!=null)
@@ -206,6 +206,13 @@ package com.towerdefect
 				rotation = value;
 			TweenLite.to(this, time, { rotation: value, ease:Linear.easeNone} );
 		}
+		
+		public function rotateImage(value:int, time:Number=0.3):void
+		{
+			if (time == 0)
+				bitmap.rotation = value;
+			TweenLite.to(this.bitmap, time, { rotation: value, ease:Linear.easeNone} );
+		}
 
 		private function rem():void
 		{
@@ -250,22 +257,18 @@ package com.towerdefect
 			//MovieClip shifts to shiftX (or lower, proportional)			
 			var deltaX:int;
 			var deltaY:int;
-			if (mouseSpecialEffect.hasOwnProperty("deltaX"))
-				deltaX = mouseSpecialEffect.deltaX;
-			else 
-				deltaX = this.width/2;
-			if (mouseSpecialEffect.hasOwnProperty("deltaY"))
-				deltaY = mouseSpecialEffect.deltaY;
-			else 
-				deltaY = this.height / 2;
+			if (mouseSpecialEffect.hasOwnProperty("mouseDeltaX"))
+				deltaX = mouseSpecialEffect.mouseDeltaX;
+			if (mouseSpecialEffect.hasOwnProperty("mouseDeltaY"))
+				deltaY = mouseSpecialEffect.mouseDeltaY;
 			var procentX:Number = (this.mouseX - xc) / deltaX;
 			var procentY:Number = (this.mouseY - yc) / deltaY;
 			procentX = Utils.matchInterval(procentX, -1, 1);
 			procentY = Utils.matchInterval(procentY, -1, 1);
-			if(mouseSpecialEffect.hasOwnProperty("shiftX"))
-				this.x = x0 - procentX * mouseSpecialEffect.shiftX;
-			if(mouseSpecialEffect.hasOwnProperty("shiftY"))
-				this.y = y0 - procentY * mouseSpecialEffect.shiftY;
+			if(mouseSpecialEffect.hasOwnProperty("menuDeltaX"))
+				this.x = x0 - procentX * mouseSpecialEffect.menuDeltaX;
+			if(mouseSpecialEffect.hasOwnProperty("menuDeltaY"))
+				this.y = y0 - procentY * mouseSpecialEffect.menuDeltaY;
 		}
 		
 		public function deleteSpecialEffect():void

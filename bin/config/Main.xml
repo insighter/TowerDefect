@@ -1,10 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<menu>
-	<vars
-		tileWidth="25" tileHeight="25"
-		tileCountX="21" tileCountY="21"
-		gridSpacing="1"
-	>
-		<font size="56" color="#000000" />
-	</vars>
-</menu>
+<main>
+
+<field>
+<tileWidth>25</tileWidth>
+<tileHeight>25</tileHeight>
+<rows>21</rows>
+<cols>21</cols>
+<gridSpacing>1</gridSpacing>
+</field>
+
+<road>
+<length>40</length>
+</road>
+
+<font size="56" color="#000000" />
+
+</main>

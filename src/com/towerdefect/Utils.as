@@ -39,74 +39,6 @@
 			return value;
 		}
 		
-		public static function imgSmooth(e:Event):void
-		{
-			(e.target.content as Bitmap).smoothing=true;
-		}
-		
-		public static function imgCenter(e:Event):void
-		{									
-			e.target.loader.x=-e.target.loader.width/2;
-			e.target.loader.y=-e.target.loader.height/2;
-		}
-		
-		public static function imgToIcon(e:Event):void
-		{									
-			e.target.loader.width=20;
-			e.target.loader.height=20;
-		}
-		
-		public static function imgStretH(e:Event):void
-		{												
-			e.target.loader.height*=2;
-		}
-		
-		public static function imgStretW(e:Event):void
-		{												
-			e.target.loader.width*=2;
-		}
-		
-		public static function to3Char(n:int):String
-		{
-			var str:String = n.toString();
-			if(str.length<2)str="0"+str;
-			if(str.length<3)str="0"+str;			
-			return str;
-		}
-		
-		public static function moduleDec(n:Number, val:Number):Number
-		{
-			var minus:Boolean = false;
-			if (n < 0) 
-			{
-				minus = true;
-				n = -n;
-			}
-			n -= Math.abs(val);
-			if (minus) n = -n;
-			return n;
-		}
-		
-		public static function moduleInc(n:Number, val:Number):Number
-		{
-			var minus:Boolean = false;
-			if (n < 0) 
-			{
-				minus = true;
-				n = -n;
-			}
-			n += Math.abs(val);
-			if (minus) n = -n;
-			return n;
-		}
-		
-		public static function rndSign():Number
-		{
-			var rnd:int = Rand(2);
-			if (rnd == 0) return -1;
-			else return 1;
-		}
-		
 		public static function convertToBoolean(txt:String):Boolean
 		{
 			return(txt=="true");
@@ -115,6 +47,12 @@
 		public static function randElement(ar:Array):*
 		{
 			return ar[Rand(ar.length)];
+		}
+		
+		public static function setIfNaN(value:Number):Number
+		{
+			if (isNaN(value)) return 0;
+			return value;
 		}
 		
 		public static function toHTML(str:String):String
@@ -175,7 +113,7 @@
 			return (int)(n*Math.random());
 		}
 		
-		public static function RandF(n:int):Number
+		public static function RandF(n:Number):Number
 		{
 			return (n*Math.random());
 		}
